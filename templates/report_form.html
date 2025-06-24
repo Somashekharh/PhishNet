@@ -1,0 +1,294 @@
+{% extends 'base.html' %}
+
+{% block title %}Report URL{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --cyber-black: #0A0E1A;
+        --cyber-blue: #00D4FF;
+        --cyber-green: #00FF88;
+        --cyber-purple: #8B5CF6;
+        --dark-gray: #1A1F2E;
+        --light-gray: #2A3441;
+        --text-primary: #FFFFFF;
+        --text-secondary: #B8C5D8;
+        --cyber-red: #FF0040;
+    }
+    
+    .cyber-container {
+        padding: 100px 20px 60px;
+        max-width: 900px;
+        margin: 0 auto;
+        position: relative;
+    }
+    
+    .cyber-header {
+        text-align: center;
+        margin-bottom: 40px;
+        position: relative;
+    }
+    
+    .cyber-title {
+        font-size: clamp(2rem, 5vw, 3rem);
+        font-weight: 900;
+        margin-bottom: 15px;
+        background: linear-gradient(135deg, var(--cyber-blue) 0%, var(--cyber-green) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        text-shadow: 0 0 20px var(--cyber-blue);
+    }
+    
+    .cyber-subtitle {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        font-family: 'Courier New', monospace;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    }
+    
+    .report-card {
+        background: rgba(26, 31, 46, 0.8);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .report-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--cyber-blue), transparent);
+    }
+    
+    .form-label {
+        color: var(--cyber-blue);
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 1px;
+        display: block;
+        text-transform: uppercase;
+    }
+    
+    .form-control, .textinput, .textarea {
+        background: rgba(10, 14, 26, 0.8) !important;
+        border: 1px solid rgba(0, 212, 255, 0.3) !important;
+        color: var(--text-primary) !important;
+        padding: 15px !important;
+        font-family: 'Courier New', monospace !important;
+        transition: all 0.3s ease !important;
+        border-radius: 8px !important;
+        font-size: 1rem !important;
+        width: 100% !important;
+        height: auto !important;
+    }
+    
+    .form-control:focus, .textinput:focus, .textarea:focus {
+        background: rgba(10, 14, 26, 0.9) !important;
+        border-color: var(--cyber-green) !important;
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.2) !important;
+        color: var(--text-primary) !important;
+        outline: none !important;
+    }
+    
+    .btn-cyber {
+        background: transparent;
+        border: 2px solid var(--cyber-blue);
+        color: var(--cyber-blue);
+        font-family: 'Courier New', monospace;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 15px 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+        width: 100%;
+        border-radius: 8px;
+        margin-top: 20px;
+        font-size: 1rem;
+    }
+    
+    .btn-cyber::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: var(--cyber-blue);
+        opacity: 0.1;
+        transition: left 0.3s ease;
+        z-index: -1;
+    }
+    
+    .btn-cyber:hover::before {
+        left: 0;
+    }
+    
+    .btn-cyber:hover {
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        transform: translateY(-3px);
+        color: var(--cyber-blue);
+    }
+    
+    .info-box {
+        background: rgba(10, 14, 26, 0.8);
+        border: 1px solid rgba(0, 212, 255, 0.2);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .info-title {
+        color: var(--cyber-blue);
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 1px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+    
+    .info-title i {
+        margin-right: 10px;
+    }
+    
+    .info-text {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        font-family: 'Courier New', monospace;
+        margin-bottom: 15px;
+        line-height: 1.6;
+    }
+    
+    .info-list {
+        padding-left: 20px;
+        margin-bottom: 0;
+    }
+    
+    .info-list li {
+        color: var(--text-secondary);
+        font-family: 'Courier New', monospace;
+        margin-bottom: 8px;
+        position: relative;
+        list-style-type: none;
+    }
+    
+    .info-list li::before {
+        content: '>';
+        position: absolute;
+        left: -15px;
+        color: var(--cyber-blue);
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .invalid-feedback {
+        color: var(--cyber-red) !important;
+        font-size: 0.85rem;
+        margin-top: 5px;
+        font-family: 'Courier New', monospace;
+    }
+    
+    @media (max-width: 768px) {
+        .cyber-container {
+            padding: 80px 15px 40px;
+        }
+        
+        .cyber-title {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<div class="cyber-container">
+    <div class="cyber-header">
+        <h1 class="cyber-title">Report URL</h1>
+        <p class="cyber-subtitle">Help us identify and combat phishing threats</p>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="info-box">
+                <div class="info-title">
+                    <i class="fas fa-info-circle"></i> Why Report?
+                </div>
+                <p class="info-text">
+                    Your reports help us improve our detection system and protect other users from emerging threats.
+                </p>
+                <ul class="info-list">
+                    <li>Contribute to community safety</li>
+                    <li>Help train our AI detection system</li>
+                    <li>Protect others from phishing attacks</li>
+                    <li>Get expert verification of suspicious URLs</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="report-card">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}" role="alert">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    
+                    <div class="form-group">
+                        <label for="{{ form.url.id_for_label }}" class="form-label">URL to Report</label>
+                        {{ form.url }}
+                        {% if form.url.errors %}
+                        <div class="invalid-feedback">
+                            {{ form.url.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                        <div class="invalid-feedback">
+                            {{ form.category.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <div class="invalid-feedback">
+                            {{ form.description.errors }}
+                        </div>
+                        {% endif %}
+                        <small class="text-muted">Please provide details about why you believe this URL is suspicious or malicious.</small>
+                    </div>
+                    
+                    <button type="submit" class="btn-cyber">
+                        <i class="fas fa-flag me-2"></i>Submit Report
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

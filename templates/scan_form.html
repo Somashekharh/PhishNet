@@ -1,0 +1,652 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Scan URL{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --cyber-black: #0A0E1A;
+        --cyber-blue: #00D4FF;
+        --cyber-green: #00FF88;
+        --cyber-purple: #8A2BE2;
+        --cyber-red: #FF0040;
+        --dark-gray: #1A1F2E;
+        --light-gray: #2A3441;
+        --text-primary: #FFFFFF;
+        --text-secondary: #B8C5D8;
+    }
+
+    /* Main page content styles */
+    .cyber-container {
+        max-width: 900px;
+        margin: 60px auto;
+        padding: 0 20px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .cyber-title {
+        font-size: clamp(2rem, 6vw, 3rem);
+        font-weight: 900;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, var(--cyber-blue) 0%, var(--cyber-green) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        text-shadow: 0 0 20px var(--cyber-blue);
+        text-align: center;
+    }
+
+    .cyber-subtitle {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        text-align: center;
+        margin-bottom: 30px;
+        font-family: 'Courier New', monospace;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    }
+    
+    .scan-card {
+        background: rgba(26, 31, 46, 0.8);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-label {
+        color: var(--text-primary);
+        font-size: 1rem;
+        margin-bottom: 10px;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 1px;
+        display: block;
+    }
+
+    .form-control, .textinput {
+        background: rgba(10, 14, 26, 0.8) !important;
+        border: 1px solid rgba(0, 212, 255, 0.3) !important;
+        color: var(--text-primary) !important;
+        padding: 15px !important;
+        font-family: 'Courier New', monospace !important;
+        transition: all 0.3s ease !important;
+        border-radius: 8px !important;
+        font-size: 1rem !important;
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    .form-control:focus, .textinput:focus {
+        background: rgba(10, 14, 26, 0.9) !important;
+        border-color: var(--cyber-blue) !important;
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.2) !important;
+        color: var(--text-primary) !important;
+        outline: none !important;
+    }
+
+    .btn-scan {
+        background: transparent !important;
+        border: 2px solid var(--cyber-blue) !important;
+        color: #FFFFFF !important;
+        font-family: 'Courier New', monospace !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        padding: 15px 25px !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+        position: relative !important;
+        overflow: hidden !important;
+        z-index: 1 !important;
+        width: 100% !important;
+        border-radius: 8px !important;
+        margin-top: 10px !important;
+        font-size: 1rem !important;
+    }
+
+    .btn-scan:hover {
+        background: linear-gradient(45deg, rgba(0, 212, 255, 0.2), rgba(0, 255, 136, 0.2)) !important;
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.4) !important;
+        transform: translateY(-3px) !important;
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.5) !important;
+    }
+    
+    .btn-scan:active {
+        transform: translateY(0) !important;
+        box-shadow: 0 0 10px rgba(0, 212, 255, 0.3) inset !important;
+    }
+    
+    /* Top scanner animation */
+    .top-scanner {
+        height: 4px;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+        display: none;
+        overflow: hidden;
+    }
+    
+    .top-scanner.active {
+        display: block;
+    }
+    
+    .top-scanner-bar {
+        height: 100%;
+        width: 20%;
+        background: linear-gradient(to right, transparent, var(--cyber-blue), var(--cyber-green), transparent);
+        position: absolute;
+        top: 0;
+        animation: scan-move 1.5s infinite ease-in-out;
+    }
+    
+    @keyframes scan-move {
+        0% { left: -20%; }
+        100% { left: 100%; }
+    }
+    
+    /* Scan Overlay Styles */
+    .scan-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(10, 14, 26, 0.95);
+        z-index: 9998;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+    
+    .scan-overlay.active {
+        opacity: 1;
+        pointer-events: all;
+    }
+    
+    .scan-status {
+        font-family: 'Courier New', monospace;
+        color: var(--cyber-blue);
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-shadow: 0 0 10px var(--cyber-blue);
+        position: relative;
+    }
+    
+    .scan-dots {
+        display: inline-block;
+        width: 0;
+        overflow: hidden;
+        vertical-align: bottom;
+        animation: dots 1.5s steps(4) infinite;
+        white-space: nowrap;
+    }
+    
+    .scan-progress {
+        width: 300px;
+        height: 4px;
+        background: rgba(0, 212, 255, 0.2);
+        border-radius: 2px;
+        overflow: hidden;
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .scan-progress-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--cyber-blue), var(--cyber-green));
+        box-shadow: 0 0 15px var(--cyber-blue);
+        animation: progress-fill 3s ease-in-out forwards;
+    }
+    
+    .scan-progress-bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 50px;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+        animation: progress-shine 2s infinite;
+    }
+    
+    .scan-log {
+        font-family: 'Courier New', monospace;
+        color: var(--cyber-green);
+        background: rgba(10, 14, 26, 0.9);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 8px;
+        width: 80%;
+        max-width: 600px;
+        height: 150px;
+        overflow: hidden;
+        padding: 10px;
+        margin-bottom: 2rem;
+    }
+    
+    .scan-log-content {
+        height: 100%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .scan-log-line {
+        margin: 0;
+        padding: 2px 0;
+        position: relative;
+        padding-left: 15px;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+    }
+    
+    .scan-log-line.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .scan-log-line::before {
+        content: '>';
+        position: absolute;
+        left: 0;
+        color: var(--cyber-blue);
+    }
+    
+    .scan-grid {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: 50px 50px;
+        background-image: 
+            linear-gradient(to right, rgba(0, 212, 255, 0.05) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(0, 212, 255, 0.05) 1px, transparent 1px);
+        z-index: -1;
+        opacity: 0.3;
+    }
+    
+    .scan-loader {
+        position: absolute;
+        top: 50%;
+        right: 25px;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255,255,255,.3);
+        border-radius: 50%;
+        border-top-color: var(--cyber-blue);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+    
+    .btn-scan.scanning .scan-loader {
+        opacity: 1;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes dots {
+        0% { width: 0em; }
+        100% { width: 1.25em; }
+    }
+    
+    @keyframes progress-fill {
+        0% { width: 0%; }
+        15% { width: 15%; }
+        25% { width: 25%; }
+        40% { width: 40%; }
+        45% { width: 45%; }
+        60% { width: 60%; }
+        75% { width: 75%; }
+        85% { width: 85%; }
+        95% { width: 95%; }
+        100% { width: 100%; }
+    }
+    
+    @keyframes progress-shine {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(200%); }
+    }
+    
+    @keyframes spin {
+        0% { transform: translateY(-50%) rotate(0deg); }
+        100% { transform: translateY(-50%) rotate(360deg); }
+    }
+    
+    /* Info Section Styles */
+    .info-section {
+        margin-top: 40px;
+        background: rgba(26, 31, 46, 0.7);
+        border: 1px solid rgba(0, 212, 255, 0.2);
+        border-radius: 12px;
+        padding: 25px;
+        position: relative;
+    }
+    
+    .info-title {
+        color: var(--cyber-blue);
+        font-size: 1.3rem;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+        font-family: 'Courier New', monospace;
+        text-align: center;
+    }
+    
+    .info-card {
+        background: rgba(10, 14, 26, 0.5);
+        border: 1px solid rgba(0, 212, 255, 0.1);
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .info-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(0, 212, 255, 0.3);
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.1);
+    }
+    
+    .info-card-title {
+        color: var(--cyber-green);
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+        font-family: 'Courier New', monospace;
+        display: flex;
+        align-items: center;
+    }
+    
+    .info-card-title i {
+        margin-right: 10px;
+    }
+    
+    .info-card-text {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Top Scanner Animation -->
+<div class="top-scanner" id="topScanner">
+    <div class="top-scanner-bar"></div>
+</div>
+
+<!-- Scanning Animation Overlay -->
+<div class="scan-overlay" id="scanOverlay">
+            <div class="scan-grid"></div>
+    <div class="scan-status">
+        <span id="scanStatusText">Initiating Scan</span>
+        <span class="scan-dots">...</span>
+            </div>
+    
+    <div class="scan-progress">
+        <div class="scan-progress-bar"></div>
+        </div>
+    
+    <div class="scan-log">
+        <div class="scan-log-content" id="scanLogContent">
+            <!-- Log lines will be added dynamically -->
+    </div>
+    </div>
+</div>
+
+<div class="cyber-container">
+    <h1 class="cyber-title">PhishNet Scanner</h1>
+    <p class="cyber-subtitle">Advanced AI-powered phishing detection system</p>
+    
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="scan-card">
+                <form method="post" novalidate autocomplete="off" id="scanForm">
+                        {% csrf_token %}
+                    
+                        <div class="mb-4">
+                        <label for="{{ form.url.id_for_label }}" class="form-label">
+                            <i class="fas fa-link me-2"></i>Enter URL to scan
+                        </label>
+                        {{ form.url.errors }}
+                                {{ form.url }}
+                        {% if form.url.help_text %}
+                            <small class="form-text text-muted">{{ form.url.help_text }}</small>
+                            {% endif %}
+                        </div>
+                        
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-scan" id="scanButton">
+                            <i class="fas fa-shield-alt me-2"></i>Scan URL
+                            <div class="scan-loader"></div>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+            <!-- Information Section -->
+            <div class="info-section">
+                <h2 class="info-title">How PhishNet Protects You</h2>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="info-card">
+                            <div class="info-card-title">
+                                <i class="fas fa-robot"></i> AI-Powered Detection
+                            </div>
+                            <p class="info-card-text">
+                                Our machine learning algorithms analyze multiple URL features to identify phishing attempts with high accuracy.
+                            </p>
+            </div>
+        </div>
+        
+                    <div class="col-md-6 mb-3">
+                        <div class="info-card">
+                            <div class="info-card-title">
+                                <i class="fas fa-lock"></i> SSL Certificate Analysis
+                </div>
+                            <p class="info-card-text">
+                                We verify the authenticity of website certificates to ensure secure connections.
+                            </p>
+            </div>
+            </div>
+            
+                    <div class="col-md-6 mb-3">
+                        <div class="info-card">
+                            <div class="info-card-title">
+                                <i class="fas fa-code"></i> Content Examination
+                </div>
+                            <p class="info-card-text">
+                                PhishNet analyzes webpage content for suspicious patterns and malicious code.
+                            </p>
+                </div>
+            </div>
+            
+                    <div class="col-md-6 mb-3">
+                        <div class="info-card">
+                            <div class="info-card-title">
+                                <i class="fas fa-database"></i> Threat Database
+                </div>
+                            <p class="info-card-text">
+                                URLs are compared against our constantly updated database of known phishing threats.
+                            </p>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Enhanced form styling
+        const inputs = document.querySelectorAll('input, textarea');
+        inputs.forEach(input => {
+            input.classList.add('form-control');
+            
+            // Add focus animation
+            input.addEventListener('focus', function() {
+                this.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.3)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.style.boxShadow = '';
+            });
+        });
+        
+        // Button hover effect
+        const scanButton = document.getElementById('scanButton');
+        if (scanButton) {
+            scanButton.addEventListener('mouseover', function() {
+                this.querySelector('i').classList.add('fa-spin');
+            });
+            
+            scanButton.addEventListener('mouseout', function() {
+                this.querySelector('i').classList.remove('fa-spin');
+            });
+        }
+        
+        // Handle form submission to show scanning animation
+        const scanForm = document.getElementById('scanForm');
+        const scanOverlay = document.getElementById('scanOverlay');
+        const topScanner = document.getElementById('topScanner');
+        const scanLogContent = document.getElementById('scanLogContent');
+        const scanStatusText = document.getElementById('scanStatusText');
+        
+        // Log messages for the scanning animation
+        const scanLogMessages = [
+            "Establishing secure connection...",
+            "Extracting URL features...",
+            "Analyzing domain information...",
+            "Checking DNS records...",
+            "Inspecting SSL certificate...",
+            "Analyzing website content...",
+            "Examining JavaScript patterns...",
+            "Detecting redirection attempts...",
+            "Checking for obfuscated code...",
+            "Processing through ML model...",
+            "Analyzing URL structure...",
+            "Checking for suspicious patterns...",
+            "Comparing with known threats...",
+            "Generating security score...",
+            "Finalizing analysis results..."
+        ];
+        
+        // Clear existing log content
+        function clearLogContent() {
+            scanLogContent.innerHTML = '';
+        }
+        
+        // Add a log line with typing effect
+        // Keep only the most recent 5 messages since we removed scrolling
+        function addLogLine(text, delay) {
+            const logLine = document.createElement('p');
+            logLine.className = 'scan-log-line';
+            logLine.textContent = text;
+            
+            // If we have too many lines, remove the oldest one
+            const existingLines = scanLogContent.querySelectorAll('.scan-log-line');
+            if (existingLines.length >= 5) {
+                scanLogContent.removeChild(existingLines[0]);
+            }
+            
+            scanLogContent.appendChild(logLine);
+            
+            setTimeout(() => {
+                logLine.classList.add('active');
+            }, delay);
+        }
+        
+        // Start the scan animation
+        function startScanAnimation() {
+            // Show overlay with animation
+            scanOverlay.classList.add('active');
+            clearLogContent();
+            
+            // Add initial log line
+            addLogLine("Initializing security scan...", 100);
+            
+            // Show scanning status messages in sequence
+            let statusMessages = ["Initiating Scan", "Processing URL", "Running Analysis", "Detecting Threats", "Generating Report"];
+            let currentStatus = 0;
+            
+            const statusInterval = setInterval(() => {
+                scanStatusText.textContent = statusMessages[currentStatus];
+                currentStatus = (currentStatus + 1) % statusMessages.length;
+            }, 2000);
+            
+            // Add log lines with random timings - but ensure we don't add too many
+            let messageIndex = 0;
+            const messageInterval = setInterval(() => {
+                if (messageIndex < scanLogMessages.length) {
+                    addLogLine(scanLogMessages[messageIndex], 10);
+                    messageIndex++;
+                } else {
+                    clearInterval(messageInterval);
+                }
+            }, 400);
+            
+            // Stop the animation after 5-6 seconds - form will submit naturally
+                    setTimeout(() => {
+                clearInterval(statusInterval);
+            }, 5000);
+        }
+        
+        if (scanForm) {
+            scanForm.addEventListener('submit', function(e) {
+                // Check form validity
+                if (!this.checkValidity()) {
+                    return; // Let the browser handle invalid form
+                }
+                
+                // Start the scanning animation
+                e.preventDefault();
+                
+                // Show the top scanner animation immediately
+                topScanner.classList.add('active');
+                
+                // Add scanning class to button for loader animation
+                scanButton.classList.add('scanning');
+                
+                // Start the scan animation
+                startScanAnimation();
+                
+                // Let the form submit naturally after animation
+                                        setTimeout(() => {
+                                            scanForm.submit();
+                }, 6000);
+            });
+        }
+        
+        // Add hover effect to info cards
+        document.querySelectorAll('.info-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.borderColor = 'rgba(0, 255, 136, 0.3)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.borderColor = 'rgba(0, 212, 255, 0.1)';
+            });
+        });
+});
+</script>
+{% endblock %}

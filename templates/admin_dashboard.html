@@ -1,0 +1,525 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}PhishNet Admin Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --cyber-black: #0A0E1A;
+        --cyber-blue: #00D4FF;
+        --cyber-green: #00FF88;
+        --cyber-purple: #8B5CF6;
+        --cyber-red: #FF0040;
+        --cyber-yellow: #FFD700;
+        --dark-gray: #1A1F2E;
+        --light-gray: #2A3441;
+        --text-primary: #FFFFFF;
+        --text-secondary: #B8C5D8;
+    }
+    
+    .cyber-container {
+        padding: 100px 20px 60px;
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+    }
+    
+    .cyber-header {
+        margin-bottom: 40px;
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .cyber-title {
+        font-size: clamp(1.8rem, 4vw, 2.5rem);
+        font-weight: 900;
+        background: linear-gradient(135deg, var(--cyber-blue) 0%, var(--cyber-green) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        text-shadow: 0 0 20px var(--cyber-blue);
+        margin-bottom: 0;
+    }
+    
+    .cyber-actions {
+        display: flex;
+        gap: 15px;
+    }
+    
+    .cyber-btn {
+        background: transparent;
+        border: 2px solid var(--cyber-blue);
+        color: var(--cyber-blue);
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-family: 'Courier New', monospace;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        font-weight: 600;
+        text-decoration: none;
+    }
+    
+    .cyber-btn i {
+        margin-right: 8px;
+    }
+    
+    .cyber-btn:hover {
+        background: rgba(0, 212, 255, 0.1);
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        transform: translateY(-3px);
+        color: var(--cyber-blue);
+    }
+    
+    .cyber-btn.home-btn {
+        border-color: var(--cyber-green);
+        color: var(--cyber-green);
+    }
+    
+    .cyber-btn.home-btn:hover {
+        background: rgba(0, 255, 136, 0.1);
+        box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        color: var(--cyber-green);
+    }
+    
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: rgba(26, 31, 46, 0.8);
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+        border-left: 4px solid;
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-card.primary {
+        border-left-color: var(--cyber-blue);
+    }
+    
+    .stat-card.success {
+        border-left-color: var(--cyber-green);
+    }
+    
+    .stat-card.warning {
+        border-left-color: var(--cyber-yellow);
+    }
+    
+    .stat-card.danger {
+        border-left-color: var(--cyber-red);
+    }
+    
+    .stat-card h3 {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+        font-family: 'Courier New', monospace;
+    }
+    
+    .stat-card .stat-value {
+        color: var(--text-primary);
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0;
+    }
+    
+    .stat-card.primary .stat-value {
+        color: var(--cyber-blue);
+    }
+    
+    .stat-card.success .stat-value {
+        color: var(--cyber-green);
+    }
+    
+    .stat-card.warning .stat-value {
+        color: var(--cyber-yellow);
+    }
+    
+    .stat-card.danger .stat-value {
+        color: var(--cyber-red);
+    }
+    
+    .system-status {
+        background: rgba(26, 31, 46, 0.8);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
+    }
+    
+    .status-title {
+        color: var(--cyber-blue);
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 1px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+    
+    .status-title i {
+        margin-right: 10px;
+    }
+    
+    .status-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    
+    .status-item {
+        background: rgba(10, 14, 26, 0.6);
+        border-radius: 8px;
+        padding: 15px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .status-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-size: 1.2rem;
+    }
+    
+    .status-icon.active {
+        background: rgba(0, 255, 136, 0.15);
+        color: var(--cyber-green);
+    }
+    
+    .status-icon.inactive {
+        background: rgba(255, 0, 64, 0.15);
+        color: var(--cyber-red);
+    }
+    
+    .status-info h4 {
+        color: var(--text-primary);
+        font-size: 1rem;
+        margin-bottom: 5px;
+    }
+    
+    .status-info p {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        margin-bottom: 0;
+    }
+    
+    .reports-card {
+        background: rgba(26, 31, 46, 0.8);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 12px;
+        margin-bottom: 30px;
+        box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
+        overflow: hidden;
+    }
+    
+    .reports-header {
+        background: rgba(10, 14, 26, 0.6);
+        padding: 15px 20px;
+        border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+    }
+    
+    .reports-title {
+        color: var(--cyber-blue);
+        font-size: 1.2rem;
+        margin-bottom: 0;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 1px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+    
+    .reports-title i {
+        margin-right: 10px;
+    }
+    
+    .reports-table {
+        width: 100%;
+        color: var(--text-primary);
+        font-family: 'Courier New', monospace;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .reports-table th {
+        background: rgba(10, 14, 26, 0.6);
+        color: var(--cyber-blue);
+        border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+        padding: 12px 15px;
+        text-align: left;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+    }
+    
+    .reports-table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+    }
+    
+    .reports-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .reports-table tr:hover {
+        background: rgba(0, 212, 255, 0.05);
+    }
+    
+    .url-cell {
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-block;
+        text-align: center;
+    }
+    
+    .status-badge.pending {
+        background: rgba(139, 92, 246, 0.1);
+        color: var(--cyber-purple);
+        border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+    
+    .status-badge.verified {
+        background: rgba(0, 255, 136, 0.1);
+        color: var(--cyber-green);
+        border: 1px solid rgba(0, 255, 136, 0.3);
+    }
+    
+    .status-badge.rejected {
+        background: rgba(255, 0, 64, 0.1);
+        color: var(--cyber-red);
+        border: 1px solid rgba(255, 0, 64, 0.3);
+    }
+    
+    .btn-action {
+        background: transparent;
+        border: 1px solid var(--cyber-blue);
+        color: var(--cyber-blue);
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        margin-right: 5px;
+        display: inline-block;
+    }
+    
+    .btn-action:hover {
+        background: rgba(0, 212, 255, 0.1);
+        box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+        color: var(--cyber-blue);
+    }
+    
+    .empty-reports {
+        padding: 30px;
+        text-align: center;
+    }
+    
+    .empty-reports p {
+        color: var(--text-secondary);
+        font-family: 'Courier New', monospace;
+        margin-bottom: 0;
+    }
+    
+    @media (max-width: 768px) {
+        .cyber-container {
+            padding: 80px 15px 40px;
+        }
+        
+        .cyber-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .cyber-title {
+            margin-bottom: 15px;
+        }
+        
+        .cyber-actions {
+            width: 100%;
+            flex-direction: column;
+        }
+        
+        .cyber-btn {
+            width: 100%;
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+        
+        .url-cell {
+            max-width: 200px;
+        }
+    }
+</style>
+
+<div class="cyber-container">
+    <div class="cyber-header">
+        <h1 class="cyber-title">PhishNet Admin Dashboard</h1>
+        <div class="cyber-actions">
+            <a href="{% url 'admin:index' %}" class="cyber-btn">
+                <i class="fas fa-cog"></i>Admin Settings
+            </a>
+            <a href="{% url 'home' %}" class="cyber-btn home-btn">
+                <i class="fas fa-home"></i>Back to Site
+            </a>
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="stats-container">
+        <div class="stat-card primary">
+            <h3>Total Users</h3>
+            <p class="stat-value">{{ total_users }}</p>
+        </div>
+        <div class="stat-card success">
+            <h3>Total Scans</h3>
+            <p class="stat-value">{{ total_scans }}</p>
+        </div>
+        <div class="stat-card warning">
+            <h3>Pending Reports</h3>
+            <p class="stat-value">{{ reports_by_status.pending }}</p>
+        </div>
+        <div class="stat-card danger">
+            <h3>Verified Threats</h3>
+            <p class="stat-value">{{ reports_by_status.verified }}</p>
+        </div>
+    </div>
+    
+    <!-- System Status -->
+    <div class="system-status">
+        <div class="status-title">
+            <i class="fas fa-server"></i> System Status
+        </div>
+        <div class="status-grid">
+            <div class="status-item">
+                <div class="status-icon {% if system_status.ml_model %}active{% else %}inactive{% endif %}">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div class="status-info">
+                    <h4>ML Model</h4>
+                    <p>{% if system_status.ml_model %}Operational{% else %}Offline{% endif %}</p>
+                </div>
+            </div>
+            <div class="status-item">
+                <div class="status-icon {% if system_status.database %}active{% else %}inactive{% endif %}">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="status-info">
+                    <h4>Database</h4>
+                    <p>{% if system_status.database %}Connected{% else %}Disconnected{% endif %}</p>
+                </div>
+            </div>
+            <div class="status-item">
+                <div class="status-icon {% if system_status.api %}active{% else %}inactive{% endif %}">
+                    <i class="fas fa-plug"></i>
+                </div>
+                <div class="status-info">
+                    <h4>API Services</h4>
+                    <p>{% if system_status.api %}Online{% else %}Offline{% endif %}</p>
+                </div>
+            </div>
+            <div class="status-item">
+                <div class="status-icon {% if system_status.cache %}active{% else %}inactive{% endif %}">
+                    <i class="fas fa-memory"></i>
+                </div>
+                <div class="status-info">
+                    <h4>Cache System</h4>
+                    <p>{% if system_status.cache %}Enabled{% else %}Disabled{% endif %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Reports -->
+    <div class="reports-card">
+        <div class="reports-header">
+            <h6 class="reports-title">
+                <i class="fas fa-flag"></i> Recent Reports
+            </h6>
+        </div>
+        
+        {% if recent_reports %}
+        <div class="table-responsive">
+            <table class="reports-table">
+                <thead>
+                    <tr>
+                        <th>URL</th>
+                        <th>Reported By</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in recent_reports %}
+                    <tr>
+                        <td>
+                            <div class="url-cell" title="{{ report.url }}">
+                                {{ report.url }}
+                            </div>
+                        </td>
+                        <td>{{ report.user.username }}</td>
+                        <td>{{ report.reported_date|date:"M j, Y" }}</td>
+                        <td>
+                            <span class="status-badge {{ report.status }}">
+                                {{ report.status|title }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{% url 'review_report' report.id %}" class="btn-action">
+                                <i class="fas fa-eye me-1"></i>Review
+                            </a>
+                            <a href="{% url 'scan' %}?url={{ report.url|urlencode }}" class="btn-action">
+                                <i class="fas fa-search me-1"></i>Scan
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-reports">
+            <p>No reports have been submitted yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

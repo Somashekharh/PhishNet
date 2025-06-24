@@ -1,0 +1,316 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --cyber-black: #0A0E1A;
+        --cyber-blue: #00D4FF;
+        --cyber-green: #00FF88;
+        --cyber-purple: #8B5CF6;
+        --cyber-red: #FF0040;
+        --dark-gray: #1A1F2E;
+        --light-gray: #2A3441;
+        --text-primary: #FFFFFF;
+        --text-secondary: #B8C5D8;
+    }
+    
+    .cyber-container {
+        padding: 100px 20px 60px;
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+    }
+    
+    .cyber-header {
+        text-align: center;
+        margin-bottom: 40px;
+        position: relative;
+    }
+    
+    .cyber-title {
+        font-size: clamp(2rem, 5vw, 3rem);
+        font-weight: 900;
+        margin-bottom: 15px;
+        background: linear-gradient(135deg, var(--cyber-blue) 0%, var(--cyber-green) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        text-shadow: 0 0 20px var(--cyber-blue);
+    }
+    
+    .cyber-subtitle {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        font-family: 'Courier New', monospace;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    }
+    
+    .contact-card {
+        background: rgba(26, 31, 46, 0.8);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .contact-info-card {
+        background: rgba(10, 14, 26, 0.8);
+        border: 1px solid rgba(0, 212, 255, 0.2);
+        border-radius: 12px;
+        padding: 25px;
+        height: 100%;
+    }
+    
+    .contact-info-title {
+        color: var(--cyber-blue);
+        font-size: 1.2rem;
+        margin-bottom: 25px;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 1px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+    
+    .contact-info-title i {
+        margin-right: 10px;
+    }
+    
+    .contact-item {
+        display: flex;
+        margin-bottom: 20px;
+    }
+    
+    .contact-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .contact-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(0, 212, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        color: var(--cyber-blue);
+        font-size: 1.2rem;
+    }
+    
+    .contact-text h3 {
+        color: var(--text-primary);
+        font-size: 1rem;
+        margin-bottom: 5px;
+    }
+    
+    .contact-text p {
+        color: var(--text-secondary);
+        font-family: 'Courier New', monospace;
+        margin-bottom: 0;
+    }
+    
+    .form-label {
+        color: var(--cyber-blue);
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 1px;
+        display: block;
+        text-transform: uppercase;
+    }
+    
+    .form-control, .textinput, .textarea {
+        background: rgba(10, 14, 26, 0.8) !important;
+        border: 1px solid rgba(0, 212, 255, 0.3) !important;
+        color: var(--text-primary) !important;
+        padding: 15px !important;
+        font-family: 'Courier New', monospace !important;
+        transition: all 0.3s ease !important;
+        border-radius: 8px !important;
+        font-size: 1rem !important;
+        width: 100% !important;
+        height: auto !important;
+    }
+    
+    .form-control:focus, .textinput:focus, .textarea:focus {
+        background: rgba(10, 14, 26, 0.9) !important;
+        border-color: var(--cyber-green) !important;
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.2) !important;
+        color: var(--text-primary) !important;
+        outline: none !important;
+    }
+    
+    .btn-cyber {
+        background: transparent;
+        border: 2px solid var(--cyber-blue);
+        color: var(--cyber-blue);
+        font-family: 'Courier New', monospace;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 15px 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+        margin-top: 20px;
+        font-size: 1rem;
+        display: inline-block;
+    }
+    
+    .btn-cyber:hover {
+        background: rgba(0, 212, 255, 0.1);
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        transform: translateY(-3px);
+        color: var(--cyber-blue);
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .invalid-feedback {
+        color: var(--cyber-red) !important;
+        font-size: 0.85rem;
+        margin-top: 5px;
+        font-family: 'Courier New', monospace;
+    }
+    
+    @media (max-width: 768px) {
+        .cyber-container {
+            padding: 80px 15px 40px;
+        }
+        
+        .cyber-title {
+            font-size: 2rem;
+        }
+        
+        .contact-info-card {
+            margin-bottom: 30px;
+        }
+    }
+</style>
+
+<div class="cyber-container">
+    <div class="cyber-header">
+        <h1 class="cyber-title">Contact Us</h1>
+        <p class="cyber-subtitle">Get in touch with our cybersecurity team</p>
+    </div>
+    
+    <div class="row">
+        <!-- Contact Information -->
+        <div class="col-lg-4">
+            <div class="contact-info-card">
+                <div class="contact-info-title">
+                    <i class="fas fa-address-card"></i> Get in Touch
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="contact-text">
+                        <h3>Email</h3>
+                        <p>support@phishnet.com</p>
+                    </div>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div class="contact-text">
+                        <h3>Phone</h3>
+                        <p>+1 (555) 123-4567</p>
+                    </div>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="contact-text">
+                        <h3>Address</h3>
+                        <p>123 Security Street<br>Cyber City, CS 12345</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contact Form -->
+        <div class="col-lg-8">
+            <div class="contact-card">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}" role="alert">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.name.id_for_label }}" class="form-label">Name</label>
+                                {{ form.name }}
+                                {% if form.name.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.name.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.email.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.subject.id_for_label }}" class="form-label">Subject</label>
+                        {{ form.subject }}
+                        {% if form.subject.errors %}
+                        <div class="invalid-feedback">
+                            {{ form.subject.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.message.id_for_label }}" class="form-label">Message</label>
+                        {{ form.message }}
+                        {% if form.message.errors %}
+                        <div class="invalid-feedback">
+                            {{ form.message.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <button type="submit" class="btn-cyber">
+                        <i class="fas fa-paper-plane me-2"></i>Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

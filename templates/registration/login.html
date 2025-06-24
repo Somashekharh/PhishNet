@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --cyber-black: #0A0E1A;
+        --cyber-blue: #00D4FF;
+        --cyber-green: #00FF88;
+        --cyber-purple: #8B5CF6;
+        --dark-gray: #1A1F2E;
+        --light-gray: #2A3441;
+        --text-primary: #FFFFFF;
+        --text-secondary: #B8C5D8;
+    }
+    
+    .login-container {
+        padding: 100px 20px 60px;
+        max-width: 500px;
+        margin: 0 auto;
+        position: relative;
+    }
+    
+    .login-card {
+        background: rgba(26, 31, 46, 0.8);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 12px;
+        padding: 40px;
+        box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .login-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, var(--cyber-blue), var(--cyber-green), var(--cyber-blue));
+    }
+    
+    .login-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .login-title {
+        font-size: 2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--cyber-blue) 0%, var(--cyber-green) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+        text-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+    }
+    
+    .login-subtitle {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        font-family: 'Courier New', monospace;
+    }
+    
+    .form-label {
+        color: var(--cyber-blue);
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 1px;
+        display: block;
+        text-transform: uppercase;
+    }
+    
+    .form-control {
+        background: rgba(10, 14, 26, 0.8) !important;
+        border: 1px solid rgba(0, 212, 255, 0.3) !important;
+        color: var(--text-primary) !important;
+        padding: 15px !important;
+        font-family: 'Courier New', monospace !important;
+        transition: all 0.3s ease !important;
+        border-radius: 8px !important;
+        font-size: 1rem !important;
+    }
+    
+    .form-control:focus {
+        background: rgba(10, 14, 26, 0.9) !important;
+        border-color: var(--cyber-green) !important;
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.2) !important;
+        color: var(--text-primary) !important;
+        outline: none !important;
+    }
+    
+    .btn-cyber {
+        background: transparent;
+        border: 2px solid var(--cyber-blue);
+        color: var(--cyber-blue);
+        font-family: 'Courier New', monospace;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 15px 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        border-radius: 8px;
+        margin-top: 10px;
+        font-size: 1rem;
+    }
+    
+    .btn-cyber::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: var(--cyber-blue);
+        opacity: 0.1;
+        transition: left 0.3s ease;
+        z-index: -1;
+    }
+    
+    .btn-cyber:hover::before {
+        left: 0;
+    }
+    
+    .btn-cyber:hover {
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        transform: translateY(-3px);
+        color: var(--cyber-blue);
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .alert-cyber {
+        background: rgba(255, 0, 64, 0.1);
+        border: 1px solid rgba(255, 0, 64, 0.3);
+        color: #FF0040;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-family: 'Courier New', monospace;
+    }
+    
+    .alert-info-cyber {
+        background: rgba(0, 212, 255, 0.1);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        color: var(--cyber-blue);
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-family: 'Courier New', monospace;
+    }
+    
+    .alert-warning-cyber {
+        background: rgba(255, 215, 0, 0.1);
+        border: 1px solid rgba(255, 215, 0, 0.3);
+        color: #FFD700;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-family: 'Courier New', monospace;
+    }
+    
+    .register-link {
+        text-align: center;
+        margin-top: 25px;
+        color: var(--text-secondary);
+        font-family: 'Courier New', monospace;
+    }
+    
+    .register-link a {
+        color: var(--cyber-green);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .register-link a:hover {
+        text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    }
+    
+    @media (max-width: 768px) {
+        .login-container {
+            padding: 80px 15px 40px;
+        }
+        
+        .login-card {
+            padding: 30px 20px;
+        }
+        
+        .login-title {
+            font-size: 1.8rem;
+        }
+    }
+</style>
+
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <h1 class="login-title">Access System</h1>
+            <p class="login-subtitle">Enter credentials to continue</p>
+        </div>
+        
+        {% if form.errors %}
+        <div class="alert-cyber">
+            <i class="fas fa-exclamation-triangle me-2"></i>Authentication failed. Invalid credentials detected.
+        </div>
+        {% endif %}
+        
+        {% if next %}
+            {% if user.is_authenticated %}
+            <div class="alert-warning-cyber">
+                <i class="fas fa-shield-alt me-2"></i>Access denied. Your clearance level is insufficient.
+            </div>
+            {% else %}
+            <div class="alert-info-cyber">
+                <i class="fas fa-info-circle me-2"></i>Authentication required to access secure area.
+            </div>
+            {% endif %}
+        {% endif %}
+        
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_username" class="form-label">
+                    <i class="fas fa-user me-2"></i>Username
+                </label>
+                <input type="text" name="username" id="id_username" class="form-control" required autofocus placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label for="id_password" class="form-label">
+                    <i class="fas fa-lock me-2"></i>Password
+                </label>
+                <input type="password" name="password" id="id_password" class="form-control" required placeholder="Enter password">
+            </div>
+            <button type="submit" class="btn-cyber">
+                <i class="fas fa-sign-in-alt me-2"></i>Login
+            </button>
+            <input type="hidden" name="next" value="{{ next }}">
+        </form>
+        
+        <div class="register-link">
+            <p>Don't have an account? <a href="{% url 'register' %}">Register here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %} 

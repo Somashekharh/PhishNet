@@ -1,0 +1,466 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static "admin/css/dashboard.css" %}">
+<style>
+    :root {
+        --cyber-black: #0A0E1A;
+        --cyber-blue: #00D4FF;
+        --cyber-green: #00FF88;
+        --cyber-purple: #8B5CF6;
+        --dark-gray: #1A1F2E;
+        --light-gray: #2A3441;
+        --text-primary: #FFFFFF;
+        --text-secondary: #B8C5D8;
+        --cyber-red: #FF3A33;
+        --cyber-orange: #FFA500;
+    }
+
+    .quick-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    .stat-card {
+        background: var(--dark-gray);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 212, 255, 0.1);
+        animation: fadeIn 0.5s ease-out forwards;
+        animation-delay: calc(var(--i) * 0.1s);
+        opacity: 0;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes borderFlow {
+        0% {
+            background-position: 0% 0%;
+        }
+        100% {
+            background-position: 200% 0%;
+        }
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--cyber-green);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 255, 136, 0.2);
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--cyber-blue), var(--cyber-green), var(--cyber-blue));
+        background-size: 200% 100%;
+        animation: borderFlow 3s linear infinite;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .stat-card:hover::before {
+        opacity: 1;
+    }
+
+    .stat-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, var(--cyber-blue), var(--cyber-green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.2rem;
+        text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Enhanced Module Styling */
+    .module {
+        background: rgba(26, 31, 46, 0.8) !important;
+        border: 1px solid rgba(0, 212, 255, 0.3) !important;
+        border-radius: 10px !important;
+        overflow: hidden !important;
+        margin-bottom: 2rem !important;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 212, 255, 0.1) !important;
+        transition: all 0.3s ease !important;
+        animation: fadeIn 0.5s ease-out forwards;
+        animation-delay: calc(var(--i) * 0.1s);
+        opacity: 0;
+    }
+
+    .module:hover {
+        transform: translateY(-5px) !important;
+        border-color: var(--cyber-green) !important;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 255, 136, 0.2) !important;
+    }
+
+    .module h2, .module caption {
+        background: linear-gradient(90deg, var(--cyber-blue), var(--cyber-green)) !important;
+        background-size: 200% 100% !important;
+        animation: borderFlow 5s linear infinite !important;
+        color: var(--cyber-black) !important;
+        font-weight: bold !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        padding: 12px 15px !important;
+    }
+
+    .module table {
+        width: 100% !important;
+    }
+
+    .module tbody tr {
+        transition: all 0.3s ease !important;
+    }
+
+    .module tbody tr:hover {
+        background: rgba(0, 212, 255, 0.1) !important;
+        transform: translateX(5px) !important;
+    }
+
+    .module tbody tr a {
+        color: var(--cyber-blue) !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .module tbody tr a:hover {
+        color: var(--cyber-green) !important;
+        text-shadow: 0 0 8px rgba(0, 255, 136, 0.3) !important;
+    }
+
+    .module tbody tr th {
+        padding: 12px 15px !important;
+    }
+
+    /* Enhanced Action Links */
+    .actionlist {
+        padding: 0 !important;
+    }
+
+    .actionlist li {
+        list-style-type: none !important;
+        padding: 8px 15px !important;
+        border-bottom: 1px solid rgba(0, 212, 255, 0.2) !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .actionlist li:last-child {
+        border-bottom: none !important;
+    }
+
+    .actionlist li:hover {
+        background: rgba(0, 212, 255, 0.1) !important;
+        transform: translateX(5px) !important;
+    }
+
+    .actionlist a {
+        display: block !important;
+        color: var(--cyber-blue) !important;
+        transition: all 0.3s ease !important;
+        position: relative !important;
+        padding-left: 25px !important;
+    }
+
+    .actionlist a:hover {
+        color: var(--cyber-green) !important;
+        text-shadow: 0 0 8px rgba(0, 255, 136, 0.3) !important;
+    }
+
+    .actionlist a::before {
+        content: '→';
+        position: absolute;
+        left: 5px;
+        color: var(--cyber-green);
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .actionlist a:hover::before {
+        opacity: 1;
+        left: 10px;
+    }
+
+    /* Recent Actions */
+    #recent-actions-module {
+        background: rgba(26, 31, 46, 0.8) !important;
+        border: 1px solid rgba(0, 212, 255, 0.3) !important;
+        border-radius: 10px !important;
+        overflow: hidden !important;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 212, 255, 0.1) !important;
+        transition: all 0.3s ease !important;
+    }
+
+    #recent-actions-module:hover {
+        border-color: var(--cyber-green) !important;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 255, 136, 0.2) !important;
+    }
+
+    #recent-actions-module h2 {
+        background: linear-gradient(90deg, var(--cyber-blue), var(--cyber-green)) !important;
+        background-size: 200% 100% !important;
+        animation: borderFlow 5s linear infinite !important;
+        color: var(--cyber-black) !important;
+        font-weight: bold !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+    }
+
+    .timeline {
+        margin-left: 2rem !important;
+        border-left: 2px solid rgba(0, 212, 255, 0.3) !important;
+    }
+
+    .timeline .action {
+        position: relative !important;
+        padding: 0.8rem 1rem !important;
+        margin-bottom: 0.5rem !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .timeline .action:hover {
+        background: rgba(0, 212, 255, 0.1) !important;
+        transform: translateX(5px) !important;
+    }
+
+    .timeline .action::before {
+        content: '' !important;
+        position: absolute !important;
+        left: -0.55rem !important;
+        top: 1.1rem !important;
+        width: 0.8rem !important;
+        height: 0.8rem !important;
+        border-radius: 50% !important;
+        background: var(--cyber-blue) !important;
+        box-shadow: 0 0 8px rgba(0, 212, 255, 0.5) !important;
+    }
+
+    .timeline .action:hover::before {
+        background: var(--cyber-green) !important;
+        box-shadow: 0 0 8px rgba(0, 255, 136, 0.5) !important;
+    }
+
+    .timeline .time {
+        color: var(--text-secondary) !important;
+        font-size: 0.8rem !important;
+        margin-bottom: 0.3rem !important;
+    }
+
+    .timeline a {
+        color: var(--cyber-blue) !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .timeline a:hover {
+        color: var(--cyber-green) !important;
+        text-shadow: 0 0 8px rgba(0, 255, 136, 0.3) !important;
+    }
+
+    /* App List */
+    .app-list {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+        gap: 1.5rem !important;
+        margin-top: 1rem !important;
+    }
+    
+    .app-item {
+        animation: fadeIn 0.5s ease-out forwards;
+        animation-delay: calc(var(--i) * 0.1s);
+        opacity: 0;
+    }
+
+    /* Welcome Message */
+    .welcome-message {
+        margin-bottom: 2rem;
+        animation: fadeIn 0.4s ease-out;
+    }
+
+    .welcome-message h1 {
+        color: var(--cyber-blue);
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+        display: flex;
+        align-items: center;
+    }
+
+    .welcome-message h1 i {
+        margin-right: 0.5rem;
+        color: var(--cyber-green);
+    }
+
+    .welcome-message p {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        max-width: 800px;
+    }
+</style>
+{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block nav-sidebar %}{% include "admin/nav_sidebar.html" %}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <div class="welcome-message">
+        <h1>
+            <i class="fas fa-shield-alt"></i>
+            PhishNet Admin Dashboard
+        </h1>
+        <p>Welcome to the PhishNet Security Admin Dashboard. Manage your application from this central command center.</p>
+    </div>
+
+    <div class="quick-stats">
+        <div class="stat-card" style="--i:1">
+            <div class="stat-icon">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="stat-value">{{ app_list|length }}</div>
+            <div class="stat-label">Applications</div>
+        </div>
+        <div class="stat-card" style="--i:2">
+            <div class="stat-icon">
+                <i class="fas fa-database"></i>
+            </div>
+            <div class="stat-value">{{ models_count|default:"0" }}</div>
+            <div class="stat-label">Models</div>
+        </div>
+        <div class="stat-card" style="--i:3">
+            <div class="stat-icon">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <div class="stat-value">{{ user_count|default:"1" }}</div>
+            <div class="stat-label">Users</div>
+        </div>
+    </div>
+
+    <div class="app-list">
+    {% for app in app_list %}
+        <div class="app-item module" style="--i:{{ forloop.counter|add:3 }}">
+            <table>
+                <caption>
+                    <a href="{{ app.app_url }}" class="section" title="{% blocktranslate with name=app.name %}Models in the {{ name }} application{% endblocktranslate %}">{{ app.name }}</a>
+                </caption>
+                {% for model in app.models %}
+                    <tr class="model-{{ model.object_name|lower }}">
+                    {% if model.admin_url %}
+                        <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+                    {% else %}
+                        <th scope="row">{{ model.name }}</th>
+                    {% endif %}
+
+                    {% if model.add_url %}
+                        <td><a href="{{ model.add_url }}" class="addlink">{% translate 'Add' %}</a></td>
+                    {% else %}
+                        <td></td>
+                    {% endif %}
+
+                    {% if model.admin_url and show_changelinks %}
+                        {% if model.view_only %}
+                            <td><a href="{{ model.admin_url }}" class="viewlink">{% translate 'View' %}</a></td>
+                        {% else %}
+                            <td><a href="{{ model.admin_url }}" class="changelink">{% translate 'Change' %}</a></td>
+                        {% endif %}
+                    {% elif show_changelinks %}
+                        <td></td>
+                    {% endif %}
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div id="content-related">
+    <div class="module" id="recent-actions-module">
+        <h2>{% translate 'Recent actions' %}</h2>
+        <h3>{% translate 'My actions' %}</h3>
+        {% load log %}
+        {% get_admin_log 10 as admin_log for_user user %}
+        {% if not admin_log %}
+            <p>{% translate 'None available' %}</p>
+        {% else %}
+            <div class="timeline">
+                {% for entry in admin_log %}
+                <div class="action {% if entry.is_addition %}addition{% endif %}{% if entry.is_change %}change{% endif %}{% if entry.is_deletion %}deletion{% endif %}">
+                    <div class="time">{{ entry.action_time|date:"M d, Y H:i" }}</div>
+                    {% if entry.is_deletion or not entry.get_admin_url %}
+                        {{ entry.object_repr }}
+                    {% else %}
+                        <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
+                    {% endif %}
+                    <br>
+                    {% if entry.content_type %}
+                        <span class="mini">{% filter capfirst %}{{ entry.content_type.name }}{% endfilter %}</span>
+                    {% else %}
+                        <span class="mini">{% translate 'Unknown content' %}</span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize animation for app items
+        const modules = document.querySelectorAll('.module');
+        modules.forEach(module => {
+            module.style.opacity = '0';
+        });
+        
+        // Count models for stats
+        let modelCount = 0;
+        document.querySelectorAll('.app-item table tr').forEach(() => {
+            modelCount++;
+        });
+        
+        // Update model count in stats
+        const modelCountElement = document.querySelector('.stat-card:nth-child(2) .stat-value');
+        if (modelCountElement) {
+            modelCountElement.textContent = modelCount;
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Logged Out{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --cyber-black: #0A0E1A;
+        --cyber-blue: #00D4FF;
+        --cyber-green: #00FF88;
+        --cyber-purple: #8B5CF6;
+        --dark-gray: #1A1F2E;
+        --light-gray: #2A3441;
+        --text-primary: #FFFFFF;
+        --text-secondary: #B8C5D8;
+    }
+    
+    .logout-card {
+        background: rgba(26, 31, 46, 0.8);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 12px;
+        padding: 40px;
+        box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .logout-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, var(--cyber-blue), var(--cyber-green), var(--cyber-blue));
+    }
+    
+    .logout-icon {
+        font-size: 4rem;
+        color: var(--cyber-green);
+        text-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        margin-bottom: 20px;
+    }
+    
+    .logout-title {
+        color: var(--cyber-blue);
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        text-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+    }
+    
+    .logout-text {
+        color: var(--text-secondary);
+        margin-bottom: 25px;
+    }
+    
+    .btn-cyber {
+        background: transparent;
+        border: 2px solid var(--cyber-blue);
+        color: var(--cyber-blue);
+        font-family: 'Courier New', monospace;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 15px 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .btn-cyber::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: var(--cyber-blue);
+        opacity: 0.1;
+        transition: left 0.3s ease;
+        z-index: -1;
+    }
+    
+    .btn-cyber:hover::before {
+        left: 0;
+    }
+    
+    .btn-cyber:hover {
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        transform: translateY(-3px);
+        color: var(--cyber-blue);
+    }
+    
+    .btn-cyber i {
+        margin-right: 10px;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="logout-card">
+                <div class="logout-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h1 class="logout-title">Successfully Logged Out</h1>
+                <p class="logout-text">Thank you for using PhishNet. You have been safely logged out.</p>
+                <a href="{% url 'landing' %}" class="btn-cyber">
+                    <i class="fas fa-home"></i>Return to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Redirect to landing page after 2 seconds
+    setTimeout(function() {
+        window.location.href = "{% url 'landing' %}";
+    }, 2000);
+</script>
+{% endblock %} 

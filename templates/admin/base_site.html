@@ -1,0 +1,477 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('PhishNet admin') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        <i class="fas fa-shield-alt" style="color: #00D4FF; margin-right: 10px; text-shadow: 0 0 10px rgba(0, 212, 255, 0.7); animation: pulse 2s infinite;"></i>
+        <span style="background: linear-gradient(135deg, #00D4FF 0%, #00FF88 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">{{ site_header|default:_('PhishNet Security Admin') }}</span>
+    </a>
+</h1>
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    @keyframes pulse {
+        0% {
+            opacity: 0.7;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+        100% {
+            opacity: 0.7;
+            transform: scale(1);
+        }
+    }
+    
+    @keyframes borderGlow {
+        0% {
+            box-shadow: 0 0 5px rgba(0, 212, 255, 0.3);
+        }
+        50% {
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.7);
+        }
+        100% {
+            box-shadow: 0 0 5px rgba(0, 212, 255, 0.3);
+        }
+    }
+    
+    @keyframes gradientFlow {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+    
+    :root {
+        --cyber-black: #0A0E1A;
+        --cyber-blue: #00D4FF;
+        --cyber-green: #00FF88;
+        --cyber-purple: #8B5CF6;
+        --dark-gray: #1A1F2E;
+        --light-gray: #2A3441;
+        --text-primary: #FFFFFF;
+        --text-secondary: #B8C5D8;
+        --cyber-red: #FF3A33;
+        --cyber-orange: #FFA500;
+    }
+
+    /* Admin Theme Overrides */
+    body {
+        background: var(--cyber-black);
+        color: var(--text-primary);
+        font-family: 'Courier New', monospace;
+        position: relative;
+    }
+    
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.05) 0%, transparent 70%);
+        z-index: -1;
+        pointer-events: none;
+    }
+
+    #header {
+        background: rgba(10, 14, 26, 0.95);
+        border-bottom: 2px solid var(--cyber-blue);
+        color: var(--text-primary);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 212, 255, 0.2);
+        position: relative;
+        z-index: 10;
+    }
+    
+    #header::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--cyber-blue), transparent);
+        animation: gradientFlow 3s infinite linear;
+        background-size: 200% 100%;
+    }
+
+    #branding h1 {
+        color: var(--cyber-blue);
+        text-shadow: 0 0 15px rgba(0, 212, 255, 0.7);
+    }
+
+    #branding h1 a:link, #branding h1 a:visited {
+        color: var(--cyber-blue);
+    }
+
+    #user-tools {
+        color: var(--text-secondary);
+    }
+
+    #user-tools a {
+        color: var(--cyber-green);
+        text-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+        border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+        transition: all 0.3s ease;
+        padding: 3px 6px;
+        border-radius: 4px;
+    }
+
+    #user-tools a:hover {
+        color: var(--text-primary);
+        text-shadow: 0 0 10px var(--cyber-green);
+        border-bottom-color: var(--cyber-green);
+        background: rgba(0, 255, 136, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .module h2, .module caption, .inline-group h2 {
+        background: linear-gradient(90deg, var(--cyber-blue), var(--cyber-green));
+        background-size: 200% 100%;
+        animation: gradientFlow 5s infinite linear;
+        color: var(--cyber-black);
+        font-weight: bold;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+    }
+
+    div.breadcrumbs {
+        background: var(--dark-gray);
+        color: var(--text-secondary);
+        border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    div.breadcrumbs a {
+        color: var(--cyber-blue);
+        transition: all 0.3s ease;
+    }
+
+    div.breadcrumbs a:hover {
+        color: var(--cyber-green);
+        text-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+        transform: translateX(2px);
+    }
+
+    /* Table styling */
+    table {
+        border-collapse: collapse;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    th {
+        background: var(--dark-gray);
+        color: var(--cyber-blue);
+        border-bottom: 1px solid var(--cyber-blue);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+        text-shadow: 0 0 5px rgba(0, 212, 255, 0.3);
+        padding: 12px 10px;
+    }
+
+    .row1 {
+        background: rgba(26, 31, 46, 0.8);
+        transition: all 0.3s ease;
+    }
+
+    .row2 {
+        background: rgba(26, 31, 46, 0.6);
+        transition: all 0.3s ease;
+    }
+    
+    .row1:hover, .row2:hover {
+        background: rgba(0, 212, 255, 0.1);
+        transform: translateY(-1px);
+    }
+
+    /* Form styling */
+    .button, input[type=submit], input[type=button], .submit-row input, a.button {
+        background: transparent;
+        border: 2px solid var(--cyber-blue);
+        color: var(--cyber-blue);
+        text-shadow: 0 0 5px rgba(0, 212, 255, 0.5);
+        transition: all 0.3s ease;
+        border-radius: 6px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .button:hover, input[type=submit]:hover, input[type=button]:hover, 
+    .submit-row input:hover, a.button:hover {
+        background: rgba(0, 212, 255, 0.1);
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .button.default, input[type=submit].default, .submit-row input.default {
+        background: rgba(0, 255, 136, 0.1);
+        border: 2px solid var(--cyber-green);
+        color: var(--cyber-green);
+        text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+    }
+
+    .button.default:hover, input[type=submit].default:hover, .submit-row input.default:hover {
+        background: rgba(0, 255, 136, 0.2);
+        box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+    }
+
+    /* Form controls */
+    .form-row {
+        border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+        padding: 15px 0;
+    }
+
+    form .aligned p.help {
+        color: var(--text-secondary);
+        font-style: italic;
+    }
+
+    .aligned label {
+        color: var(--cyber-blue);
+        text-shadow: 0 0 5px rgba(0, 212, 255, 0.3);
+        font-weight: 600;
+    }
+
+    form .aligned p.help, form .aligned div.help {
+        margin-left: 170px;
+    }
+
+    form .aligned ul {
+        margin-left: 170px;
+    }
+
+    input, textarea, select, .form-row p, form .button {
+        background: rgba(26, 31, 46, 0.8);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        color: var(--text-primary);
+        border-radius: 6px;
+        padding: 8px 12px;
+    }
+
+    input:focus, textarea:focus, select:focus {
+        border-color: var(--cyber-green);
+        box-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+        outline: none;
+    }
+
+    /* Dashboard modules */
+    .dashboard .module {
+        background: var(--dark-gray);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 212, 255, 0.1);
+        margin-bottom: 20px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .dashboard .module:hover {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 212, 255, 0.2);
+        transform: translateY(-3px);
+        border-color: var(--cyber-green);
+    }
+
+    .dashboard .module table th {
+        background: rgba(0, 212, 255, 0.1);
+    }
+
+    /* Links */
+    a:link, a:visited {
+        color: var(--cyber-blue);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    a:hover {
+        color: var(--cyber-green);
+        text-shadow: 0 0 5px rgba(0, 255, 136, 0.3);
+    }
+
+    /* Messages */
+    .messagelist {
+        background: transparent;
+    }
+
+    ul.messagelist li {
+        background: var(--dark-gray);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        color: var(--text-primary);
+        border-radius: 6px;
+        margin-bottom: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    ul.messagelist li.success {
+        background: rgba(0, 255, 136, 0.1);
+        border-color: var(--cyber-green);
+    }
+
+    ul.messagelist li.warning {
+        background: rgba(255, 165, 0, 0.1);
+        border-color: var(--cyber-orange);
+    }
+
+    ul.messagelist li.error {
+        background: rgba(255, 58, 51, 0.1);
+        border-color: var(--cyber-red);
+    }
+
+    /* Sidebar */
+    #nav-sidebar {
+        background: var(--dark-gray);
+        border-right: 1px solid rgba(0, 212, 255, 0.3);
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
+    }
+
+    #nav-sidebar .module th {
+        color: var(--cyber-blue);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 0 5px rgba(0, 212, 255, 0.3);
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    #nav-sidebar .current-app .section:link, 
+    #nav-sidebar .current-app .section:visited {
+        color: var(--cyber-green);
+        text-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+        font-weight: 600;
+    }
+
+    #nav-sidebar .current-model {
+        background: rgba(0, 212, 255, 0.1);
+        border-left: 3px solid var(--cyber-blue);
+    }
+    
+    #nav-sidebar a {
+        transition: all 0.3s ease;
+    }
+    
+    #nav-sidebar a:hover {
+        background: rgba(0, 212, 255, 0.1);
+        transform: translateX(3px);
+    }
+
+    /* Pagination */
+    .paginator a:link, .paginator a:visited {
+        background: rgba(0, 212, 255, 0.1);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 4px;
+        transition: all 0.3s ease;
+    }
+
+    .paginator a:hover {
+        background: rgba(0, 212, 255, 0.2);
+        box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .paginator .this-page {
+        background: rgba(0, 255, 136, 0.2);
+        border: 1px solid var(--cyber-green);
+        color: var(--cyber-green);
+        border-radius: 4px;
+        font-weight: 600;
+    }
+
+    /* Delete confirmation */
+    .delete-confirmation form {
+        background: var(--dark-gray);
+        border: 1px solid var(--cyber-red);
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .delete-confirmation form input[type=submit] {
+        background: rgba(255, 58, 51, 0.1);
+        border: 2px solid var(--cyber-red);
+        color: var(--cyber-red);
+    }
+
+    .delete-confirmation form input[type=submit]:hover {
+        background: rgba(255, 58, 51, 0.2);
+        box-shadow: 0 0 15px rgba(255, 58, 51, 0.3);
+    }
+
+    /* Calendar widget */
+    .calendarbox, .clockbox {
+        background: var(--dark-gray);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .calendar caption, .calendarbox h2 {
+        background: var(--cyber-blue);
+        color: var(--cyber-black);
+        font-weight: 600;
+    }
+
+    .calendar td a:hover {
+        background: var(--cyber-blue);
+    }
+
+    .calendar td.selected a {
+        background: var(--cyber-green);
+    }
+    
+    /* Content styles */
+    #content {
+        padding: 20px;
+    }
+    
+    #content h1 {
+        color: var(--cyber-blue);
+        text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        font-weight: 700;
+        letter-spacing: 1px;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 1024px) {
+        #nav-sidebar {
+            width: 220px;
+        }
+    }
+
+    @media (max-width: 767px) {
+        #header {
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 30px;
+        }
+
+        #branding {
+            margin-bottom: 10px;
+        }
+
+        #user-tools {
+            margin-top: 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block nav-global %}{% endblock %} 

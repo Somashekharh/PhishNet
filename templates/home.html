@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="min-height: 100vh;">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto text-center">
+            <h1 class="display-4 fw-bold text-primary mb-4">
+                <i class="fas fa-shield-alt me-3"></i>Welcome to PhishNet
+            </h1>
+            <p class="lead text-muted mb-4">Your trusted partner in phishing detection and online security. Start scanning URLs and protect yourself from potential threats.</p>
+            <div class="d-grid gap-3 d-sm-flex justify-content-center">
+                <a href="{% url 'scan' %}" class="btn btn-primary btn-lg px-5 py-3">
+                    <i class="fas fa-search me-2"></i>Start Scanning
+                </a>
+                <a href="{% url 'dashboard' %}" class="home-btn btn-lg px-5 py-3">
+                    <i class="fas fa-chart-line me-2"></i>View Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm hover-lift">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon bg-primary bg-gradient text-white rounded-circle mb-3">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3 class="h4 mb-3">ML-Powered Analysis</h3>
+                    <p class="text-muted mb-0">Advanced machine learning model trained on thousands of phishing URLs for accurate detection.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm hover-lift">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon bg-success bg-gradient text-white rounded-circle mb-3">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3 class="h4 mb-3">Real-time Protection</h3>
+                    <p class="text-muted mb-0">Get instant analysis results and protect yourself from phishing attacks in real-time.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm hover-lift">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon bg-info bg-gradient text-white rounded-circle mb-3">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3 class="h4 mb-3">Detailed Reports</h3>
+                    <p class="text-muted mb-0">Access comprehensive analysis reports with visual indicators and security insights.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card border-0 bg-light">
+                <div class="card-body p-5">
+                    <div class="row align-items-center">
+                        <div class="col-lg-8 mb-4 mb-lg-0">
+                            <h2 class="h3 fw-bold mb-3">Ready to scan a URL?</h2>
+                            <p class="lead mb-0">Use our advanced phishing detection system to check any suspicious URLs.</p>
+                        </div>
+                        <div class="col-lg-4 text-lg-end">
+                            <a href="{% url 'scan' %}" class="btn btn-primary btn-lg px-4">
+                                <i class="fas fa-search me-2"></i>Start Scanning
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+html {
+    overflow-y: scroll; /* Prevent scrollbar jitter */
+}
+
+.hover-lift {
+    transition: transform 0.2s ease;
+}
+.hover-lift:hover {
+    transform: translateY(-5px);
+}
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,625 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile Settings - PhishNet{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --cyber-black: #0A0E1A;
+        --cyber-blue: #00D4FF;
+        --cyber-green: #00FF88;
+        --cyber-purple: #8B5CF6;
+        --dark-gray: #1A1F2E;
+        --light-gray: #8B93A7;
+        --cyber-red: #FF0040;
+    }
+
+    .profile-container {
+        background: var(--cyber-black);
+        min-height: 100vh;
+        padding: 120px 0 60px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.15) 0%, transparent 50%);
+        z-index: -1;
+    }
+
+    .cyber-card {
+        background: rgba(26, 31, 46, 0.9);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .cyber-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 255, 136, 0.2);
+        border-color: var(--cyber-green);
+    }
+
+    .profile-header {
+        text-align: center;
+        padding: 2rem;
+        border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+        position: relative;
+    }
+
+    .avatar-container {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 1.5rem;
+    }
+
+    .avatar-circle {
+        width: 120px;
+        height: 120px;
+        background: linear-gradient(135deg, var(--cyber-blue), var(--cyber-green));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid var(--cyber-blue);
+        box-shadow: 
+            0 0 30px rgba(0, 212, 255, 0.5),
+            inset 0 0 20px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+        animation: pulse 2s infinite;
+    }
+
+    .avatar-circle i {
+        font-size: 3rem;
+        color: var(--cyber-black);
+        text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        z-index: 1;
+        position: relative;
+    }
+
+    .user-info h2 {
+        color: var(--cyber-blue);
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+    }
+
+    .user-status {
+        color: var(--cyber-green);
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .user-status::before {
+        content: '> ';
+        color: var(--cyber-green);
+    }
+
+    .join-date {
+        color: var(--light-gray);
+        font-size: 0.9rem;
+    }
+
+    .nav-pills {
+        background: rgba(26, 31, 46, 0.5);
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+
+    .nav-pills .nav-link {
+        color: var(--light-gray);
+        font-weight: 500;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        margin-bottom: 0.5rem;
+        background: rgba(0, 212, 255, 0.05);
+        border: 1px solid transparent;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .nav-pills .nav-link:hover {
+        color: var(--cyber-blue);
+        background: rgba(0, 212, 255, 0.1);
+        border-color: var(--cyber-blue);
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        transform: translateX(5px);
+    }
+
+    .nav-pills .nav-link.active {
+        color: var(--cyber-green);
+        background: rgba(0, 255, 136, 0.1);
+        border-color: var(--cyber-green);
+        box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+    }
+
+    .form-label {
+        color: var(--cyber-blue);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        background: rgba(26, 31, 46, 0.8) !important;
+        border: 1px solid rgba(0, 212, 255, 0.3) !important;
+        border-radius: 8px !important;
+        color: #ffffff !important;
+        padding: 0.75rem 1rem !important;
+        font-family: 'Courier New', monospace !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .form-control:focus {
+        background: rgba(26, 31, 46, 0.9) !important;
+        border-color: var(--cyber-green) !important;
+        box-shadow: 0 0 15px rgba(0, 255, 136, 0.3) !important;
+        color: #ffffff !important;
+    }
+
+    .form-control::placeholder {
+        color: var(--light-gray);
+        opacity: 0.7;
+    }
+
+    .btn-cyber {
+        background: transparent !important;
+        border: 2px solid var(--cyber-blue) !important;
+        color: var(--cyber-blue) !important;
+        padding: 0.75rem 2rem !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        transition: all 0.3s ease !important;
+        position: relative !important;
+        overflow: hidden !important;
+        z-index: 1 !important;
+    }
+
+    .btn-cyber::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: var(--cyber-blue);
+        opacity: 0.1;
+        transition: left 0.3s ease;
+        z-index: -1;
+    }
+
+    .btn-cyber:hover::before {
+        left: 0;
+    }
+
+    .btn-cyber:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 10px 25px rgba(0, 212, 255, 0.4) !important;
+        color: var(--cyber-blue) !important;
+    }
+
+    .btn-danger-cyber {
+        background: transparent !important;
+        border: 2px solid var(--cyber-red) !important;
+        color: var(--cyber-red) !important;
+        padding: 0.75rem 2rem !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        transition: all 0.3s ease !important;
+        position: relative !important;
+        overflow: hidden !important;
+        z-index: 1 !important;
+    }
+
+    .btn-danger-cyber::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: var(--cyber-red);
+        opacity: 0.1;
+        transition: left 0.3s ease;
+        z-index: -1;
+    }
+
+    .btn-danger-cyber:hover::before {
+        left: 0;
+    }
+
+    .btn-danger-cyber:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 10px 25px rgba(255, 0, 64, 0.4) !important;
+    }
+
+    .password-strength {
+        margin-top: 0.5rem;
+        font-size: 0.8rem;
+        font-family: 'Courier New', monospace;
+    }
+
+    .strength-weak { color: var(--cyber-red); }
+    .strength-medium { color: #FFA500; }
+    .strength-strong { color: var(--cyber-green); }
+
+    .alert-cyber {
+        background: rgba(0, 255, 136, 0.1);
+        border: 1px solid var(--cyber-green);
+        border-radius: 8px;
+        color: var(--cyber-green);
+        padding: 1rem;
+        margin-bottom: 1rem;
+        font-family: 'Courier New', monospace;
+    }
+
+    .alert-danger-cyber {
+        background: rgba(255, 0, 64, 0.1);
+        border: 1px solid var(--cyber-red);
+        border-radius: 8px;
+        color: var(--cyber-red);
+        padding: 1rem;
+        margin-bottom: 1rem;
+        font-family: 'Courier New', monospace;
+    }
+
+    .terminal-prompt {
+        color: var(--cyber-green);
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .terminal-prompt::before {
+        content: '$ ';
+        color: var(--cyber-green);
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+        50% {
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.7);
+        }
+    }
+
+    .fade-in {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .profile-container {
+            padding: 80px 15px 30px;
+        }
+        
+        .cyber-card {
+            margin: 0.5rem 0;
+        }
+        
+        .avatar-circle {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .avatar-circle i {
+            font-size: 2.5rem;
+        }
+        
+        .user-info h2 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- Profile Header -->
+                <div class="cyber-card fade-in mb-4">
+                    <div class="profile-header">
+                        <div class="avatar-container">
+                            <div class="avatar-circle">
+                                <i class="fas fa-user-astronaut"></i>
+                            </div>
+                        </div>
+                        <div class="user-info">
+                            <h2>{{ user.username }}</h2>
+                            <div class="user-status">SYSTEM STATUS: OPERATIONAL</div>
+                            <div class="join-date">Member since {{ user.date_joined|date:"F Y" }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Sidebar Navigation -->
+                    <div class="col-lg-3 mb-4">
+                        <div class="cyber-card fade-in">
+                            <div class="p-3">
+                                <div class="terminal-prompt">navigation_menu.exe</div>
+                                <ul class="nav nav-pills flex-column" id="profile-tabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="profile-tab" data-bs-toggle="pill" data-bs-target="#profile-info" type="button" role="tab">
+                                            <i class="fas fa-user-cog me-2"></i>Profile Data
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="security-tab" data-bs-toggle="pill" data-bs-target="#security-settings" type="button" role="tab">
+                                            <i class="fas fa-shield-alt me-2"></i>Security Protocol
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="delete-tab" data-bs-toggle="pill" data-bs-target="#delete-account" type="button" role="tab">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>Terminate Account
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div class="col-lg-9">
+                        <div class="tab-content" id="profile-tabContent">
+                            <!-- Profile Information Tab -->
+                            <div class="tab-pane fade show active" id="profile-info" role="tabpanel">
+                                <div class="cyber-card fade-in">
+                                    <div class="p-4">
+                                        <div class="terminal-prompt">profile_update.exe --mode=edit</div>
+                                        <h4 class="mb-4" style="color: var(--cyber-blue); text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);">Profile Information</h4>
+                                        
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                <div class="alert-cyber">
+                                                    <i class="fas fa-check-circle me-2"></i>{{ message }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+
+                                        <form method="post" action="{% url 'profile' %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="update_profile">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="email" class="form-label">
+                                                        <i class="fas fa-envelope me-2"></i>Email Address
+                                                    </label>
+                                                    <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" placeholder="user@phishnet.matrix">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="username" class="form-label">
+                                                        <i class="fas fa-user me-2"></i>Username
+                                                    </label>
+                                                    <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" placeholder="cyber_agent_001">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="first_name" class="form-label">
+                                                        <i class="fas fa-id-card me-2"></i>First Name
+                                                    </label>
+                                                    <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}" placeholder="Agent">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="last_name" class="form-label">
+                                                        <i class="fas fa-id-card me-2"></i>Last Name
+                                                    </label>
+                                                    <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}" placeholder="Matrix">
+                                                </div>
+                                            </div>
+                                            <div class="text-end">
+                                                <button type="submit" class="btn btn-cyber">
+                                                    <i class="fas fa-save me-2"></i>Update Profile
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Security Settings Tab -->
+                            <div class="tab-pane fade" id="security-settings" role="tabpanel">
+                                <div class="cyber-card fade-in">
+                                    <div class="p-4">
+                                        <div class="terminal-prompt">security_protocol.exe --update-credentials</div>
+                                        <h4 class="mb-4" style="color: var(--cyber-blue); text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);">Security Settings</h4>
+                                        
+                                        <form method="post" action="{% url 'profile_security' %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="change_password">
+                                            <div class="mb-3">
+                                                <label for="old_password" class="form-label">
+                                                    <i class="fas fa-lock me-2"></i>Current Password
+                                                </label>
+                                                <input type="password" class="form-control" id="old_password" name="old_password" placeholder="Enter current password">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="new_password1" class="form-label">
+                                                    <i class="fas fa-key me-2"></i>New Password
+                                                </label>
+                                                <input type="password" class="form-control" id="new_password1" name="new_password1" placeholder="Enter new password">
+                                                <div class="password-strength" id="password-strength"></div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="new_password2" class="form-label">
+                                                    <i class="fas fa-key me-2"></i>Confirm New Password
+                                                </label>
+                                                <input type="password" class="form-control" id="new_password2" name="new_password2" placeholder="Confirm new password">
+                                            </div>
+                                            <div class="text-end">
+                                                <button type="submit" class="btn btn-cyber">
+                                                    <i class="fas fa-shield-alt me-2"></i>Update Password
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Delete Account Tab -->
+                            <div class="tab-pane fade" id="delete-account" role="tabpanel">
+                                <div class="cyber-card fade-in">
+                                    <div class="p-4">
+                                        <div class="terminal-prompt">account_termination.exe --danger-zone</div>
+                                        <h4 class="mb-4" style="color: var(--cyber-red); text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255, 0, 64, 0.3);">Danger Zone</h4>
+                                        
+                                        <div class="alert-danger-cyber">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                            <strong>WARNING:</strong> This action cannot be undone. All your data will be permanently deleted from the system.
+                                        </div>
+                                        
+                                        <p style="color: var(--light-gray); margin-bottom: 2rem;">
+                                            Deleting your account will remove all your scan history, reports, and profile information. 
+                                            This action is irreversible and cannot be recovered.
+                                        </p>
+                                        
+                                        <form method="post" action="{% url 'profile_delete' %}" onsubmit="return confirm('Are you absolutely sure you want to delete your account? This action cannot be undone.');">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="delete_account">
+                                            <div class="mb-3">
+                                                <label for="confirm_password" class="form-label">
+                                                    <i class="fas fa-lock me-2"></i>Confirm Password
+                                                </label>
+                                                <input type="password" class="form-control" id="confirm_password" name="password" placeholder="Enter your password to confirm" required>
+                                            </div>
+                                            <div class="text-end">
+                                                <button type="submit" class="btn btn-danger-cyber">
+                                                    <i class="fas fa-trash-alt me-2"></i>Delete Account
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Password strength checker
+document.getElementById('new_password1')?.addEventListener('input', function() {
+    const password = this.value;
+    const strengthDiv = document.getElementById('password-strength');
+    
+    if (password.length === 0) {
+        strengthDiv.textContent = '';
+        return;
+    }
+    
+    let strength = 0;
+    let feedback = [];
+    
+    if (password.length >= 8) strength++;
+    else feedback.push('at least 8 characters');
+    
+    if (/[a-z]/.test(password)) strength++;
+    else feedback.push('lowercase letters');
+    
+    if (/[A-Z]/.test(password)) strength++;
+    else feedback.push('uppercase letters');
+    
+    if (/[0-9]/.test(password)) strength++;
+    else feedback.push('numbers');
+    
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    else feedback.push('special characters');
+    
+    if (strength < 3) {
+        strengthDiv.className = 'password-strength strength-weak';
+        strengthDiv.textContent = `WEAK - Missing: ${feedback.join(', ')}`;
+    } else if (strength < 5) {
+        strengthDiv.className = 'password-strength strength-medium';
+        strengthDiv.textContent = `MEDIUM - Consider adding: ${feedback.join(', ')}`;
+    } else {
+        strengthDiv.className = 'password-strength strength-strong';
+        strengthDiv.textContent = 'STRONG - Password meets security requirements';
+    }
+});
+
+// Add glitch effect to form inputs on focus
+document.querySelectorAll('.form-control').forEach(input => {
+    input.addEventListener('focus', function() {
+        this.style.textShadow = '0 0 5px var(--cyber-green)';
+        this.style.boxShadow = '0 0 15px rgba(0, 255, 136, 0.2)';
+        this.style.borderColor = 'var(--cyber-green)';
+    });
+    
+    input.addEventListener('blur', function() {
+        this.style.textShadow = 'none';
+        this.style.boxShadow = '';
+        this.style.borderColor = 'rgba(0, 212, 255, 0.3)';
+    });
+});
+
+// Add hover effects to buttons
+document.querySelectorAll('.btn-cyber').forEach(btn => {
+    btn.addEventListener('mouseenter', function() {
+        this.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.4)';
+        this.style.transform = 'translateY(-3px)';
+    });
+    
+    btn.addEventListener('mouseleave', function() {
+        this.style.boxShadow = '';
+        this.style.transform = '';
+    });
+});
+
+document.querySelectorAll('.btn-danger-cyber').forEach(btn => {
+    btn.addEventListener('mouseenter', function() {
+        this.style.boxShadow = '0 0 20px rgba(255, 0, 64, 0.4)';
+        this.style.transform = 'translateY(-3px)';
+    });
+    
+    btn.addEventListener('mouseleave', function() {
+        this.style.boxShadow = '';
+        this.style.transform = '';
+    });
+});
+</script>
+{% endblock %}

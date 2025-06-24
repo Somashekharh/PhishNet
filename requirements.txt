@@ -1,0 +1,39 @@
+Django==5.0.2
+# Core Django and Web Framework
+Django==5.0.2
+
+# HTTP Requests and URL Validation
+requests==2.31.0
+validators==0.22.0
+urllib3==2.2.1
+
+# Domain and Network Analysis
+python-whois==0.8.0
+dnspython==2.5.0
+pyOpenSSL==24.0.0
+tldextract>=5.1.1
+
+# Web Scraping and Content Analysis
+beautifulsoup4==4.12.3
+selenium>=4.15.2
+playwright==1.52.0
+webdriver-manager>=4.0.1
+
+# Machine Learning and Data Processing
+scikit-learn==1.3.2
+numpy==1.26.4
+pandas==2.2.0
+joblib==1.3.2
+xgboost==2.0.3
+
+# PDF Generation and Image Processing
+pdfkit==1.0.0
+Pillow==11.2.1
+
+# Utilities and Environment
+python-dotenv>=1.0.0
+tqdm>=4.66.0
+python-dateutil==2.8.2
+
+# Additional Dependencies
+pyee==13.0.0

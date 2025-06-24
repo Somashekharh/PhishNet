@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+            color: #B8C5D8;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #0A0E1A;
+        }
+        .header {
+            border-bottom: 2px solid #00D4FF;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .header h2 {
+            color: #00D4FF;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #1A1F2E;
+            font-size: 12px;
+            color: #B8C5D8;
+        }
+        .message-container {
+            background-color: #1A1F2E;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #00D4FF;
+            color: #FFFFFF;
+        }
+        .original-message {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #1A1F2E;
+            border-left: 4px solid #00FF88;
+            color: #FFFFFF;
+        }
+        strong {
+            color: #00FF88;
+        }
+        p {
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>{{ site_name }} Support</h2>
+    </div>
+
+    <p>Dear {{ name }},</p>
+
+    <p>Thank you for contacting us regarding:</p>
+    <div class="message-container">
+        <strong>{{ subject }}</strong>
+    </div>
+
+    <p>Here is our response:</p>
+    <div class="message-container">
+        {{ reply|linebreaks }}
+    </div>
+
+    <div class="original-message">
+        <p><strong>Your original message:</strong></p>
+        {{ message|linebreaks }}
+    </div>
+
+    <p>If you have any further questions, please don't hesitate to contact us again.</p>
+
+    <p>Best regards,<br>
+    {{ admin_name }}<br>
+    {{ site_name }} Support Team</p>
+
+    <div class="footer">
+        <p>This is an automated response to your contact form submission. Please do not reply directly to this email.</p>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load url_analysis %}
+
+{% block title %}Review Report - {{ report.url|truncatechars:50 }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .report-card {
+        border: 1px solid rgba(0, 212, 255, 0.2);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 212, 255, 0.1);
+    }
+    
+    .url-box {
+        background: rgba(26, 31, 46, 0.7);
+        border: 1px solid rgba(0, 212, 255, 0.1);
+        border-radius: 4px;
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    
+    .description-box {
+        background: rgba(26, 31, 46, 0.7);
+        border: 1px solid rgba(0, 212, 255, 0.1);
+        border-radius: 4px;
+        padding: 1rem;
+    }
+    
+    .status-badge {
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        padding: 0.35rem 0.65rem;
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+    }
+    
+    .action-btn {
+        min-width: 120px;
+    }
+    
+    .info-label {
+        color: var(--cyber-blue);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 0 8px rgba(0, 212, 255, 0.3);
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-left: 2rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 2px;
+        background-color: rgba(0, 212, 255, 0.3);
+    }
+    
+    .timeline-dot {
+        position: absolute;
+        left: -0.5rem;
+        top: 0.25rem;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        background-color: var(--cyber-blue);
+        box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+    }
+    
+    /* Card Styling */
+    .card {
+        background: rgba(26, 31, 46, 0.8) !important;
+        border: 1px solid rgba(0, 212, 255, 0.2) !important;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 212, 255, 0.1);
+    }
+    
+    .card-header {
+        background: rgba(10, 14, 26, 0.9) !important;
+        border-bottom: 1px solid rgba(0, 212, 255, 0.3) !important;
+        color: var(--cyber-blue) !important;
+    }
+    
+    .card-header h5 {
+        color: var(--cyber-blue) !important;
+        text-shadow: 0 0 8px rgba(0, 212, 255, 0.4);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .card-body {
+        background: rgba(26, 31, 46, 0.6) !important;
+    }
+    
+    /* List Group Styling */
+    .list-group-item {
+        background: rgba(26, 31, 46, 0.6) !important;
+        color: var(--text-secondary) !important;
+        border: 1px solid rgba(0, 212, 255, 0.1) !important;
+        transition: all 0.3s ease;
+    }
+    
+    .list-group-item:hover {
+        background: rgba(26, 31, 46, 0.8) !important;
+        transform: translateX(5px);
+    }
+    
+    /* Enhanced Back Button Styling */
+    .back-btn {
+        background: rgba(26, 31, 46, 0.7) !important;
+        border: 2px solid rgba(0, 212, 255, 0.5) !important;
+        color: var(--cyber-blue) !important;
+        padding: 0.7rem 1.2rem;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+    }
+    
+    .back-btn:hover {
+        background: rgba(0, 212, 255, 0.2) !important;
+        border-color: var(--cyber-blue) !important;
+        transform: translateX(-5px);
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+    }
+    
+    .back-btn i {
+        margin-right: 0.5rem;
+        font-size: 1.1rem;
+        text-shadow: 0 0 10px rgba(0, 212, 255, 0.7);
+    }
+    
+    /* Enhanced Breadcrumb Styling */
+    .breadcrumb-item a {
+        color: var(--cyber-blue) !important;
+        text-shadow: 0 0 5px rgba(0, 212, 255, 0.3);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .breadcrumb-item a:hover {
+        color: var(--cyber-green) !important;
+        text-shadow: 0 0 5px rgba(0, 255, 136, 0.4);
+    }
+    
+    .breadcrumb-item.active {
+        color: var(--text-secondary);
+    }
+    
+    .breadcrumb-item+.breadcrumb-item::before {
+        color: var(--text-secondary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header with Navigation -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0">Review Report</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Admin Dashboard</a></li>
+                    <li class="breadcrumb-item active">Review Report</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{% url 'admin_dashboard' %}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Main Report Information -->
+        <div class="col-lg-8 mb-4">
+            <div class="card report-card h-100">
+                <div class="card-header py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Report Details</h5>
+                        <span class="badge {% if report.status == 'pending' %}bg-warning{% elif report.status == 'verified' %}bg-danger{% else %}bg-success{% endif %} status-badge">
+                            {{ report.status|title }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- URL -->
+                    <div class="mb-4">
+                        <label class="info-label">Reported URL</label>
+                        <div class="url-box">
+                            <a href="{{ report.url }}" target="_blank" rel="noopener noreferrer" class="text-break">
+                                {{ report.url }}
+                                <i class="fas fa-external-link-alt ms-2"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <label class="info-label">Description</label>
+                        <div class="description-box">
+                            {{ report.description|linebreaks }}
+                        </div>
+                    </div>
+
+                    <!-- Reporter Information -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="info-label">Reported By</label>
+                            <p class="mb-1">{{ report.user.username }}</p>
+                            <small class="text-muted">{{ report.user.email }}</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="info-label">Report Date</label>
+                            <p class="mb-1">{{ report.reported_date|date:"F j, Y" }}</p>
+                            <small class="text-muted">{{ report.reported_date|time:"g:i A" }}</small>
+                        </div>
+                    </div>
+
+                    {% if report.status != 'pending' %}
+                    <!-- Review Information -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="info-label">Reviewed By</label>
+                            <p class="mb-1">{{ report.reviewed_by.username }}</p>
+                            <small class="text-muted">{{ report.reviewed_by.email }}</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="info-label">Review Date</label>
+                            <p class="mb-1">{{ report.reviewed_date|date:"F j, Y" }}</p>
+                            <small class="text-muted">{{ report.reviewed_date|time:"g:i A" }}</small>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions and Quick Analysis -->
+        <div class="col-lg-4 mb-4">
+            {% if report.status == 'pending' %}
+            <!-- Review Actions -->
+            <div class="card mb-4">
+                <div class="card-header py-3">
+                    <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Review Actions</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-3">
+                            <button type="submit" name="status" value="verified" class="btn btn-danger action-btn">
+                                <i class="fas fa-shield-alt me-2"></i>Mark as Phishing
+                            </button>
+                            <button type="submit" name="status" value="rejected" class="btn btn-success action-btn">
+                                <i class="fas fa-check me-2"></i>Mark as Safe
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Quick Analysis -->
+            <div class="card">
+                <div class="card-header py-3">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Quick Analysis</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            HTTPS
+                            {% if report.url|is_https %}
+                            <span class="badge bg-success rounded-pill">Yes</span>
+                            {% else %}
+                            <span class="badge bg-danger rounded-pill">No</span>
+                            {% endif %}
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Domain Length
+                            <span class="badge bg-primary rounded-pill">
+                                {{ report.url|domain_length }}
+                            </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Special Characters
+                            <span class="badge bg-primary rounded-pill">
+                                {{ report.url|special_chars_count }}
+                            </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            IP Address
+                            {% if report.url|is_ip_address %}
+                            <span class="badge bg-danger rounded-pill">Yes</span>
+                            {% else %}
+                            <span class="badge bg-success rounded-pill">No</span>
+                            {% endif %}
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Domain
+                            <span class="badge bg-primary rounded-pill">
+                                {{ report.url|get_domain }}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add any additional JavaScript functionality here
+</script>
+{% endblock %} 
