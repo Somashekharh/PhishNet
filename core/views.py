@@ -16,7 +16,7 @@ import numpy as np
 from .forms import UserRegistrationForm, URLScanForm, ReportForm, ContactForm
 from .models import URLScan, Report, Contact
 from .ml_model.predictor import URLPredictor
-from .url_analyzer import URLAnalyzer
+from .url_analyzer import URLAnalyzer, domain_exists
 
 # Load the ML model and scaler
 model_path = os.path.join(os.path.dirname(__file__), 'ml_model', 'model.pkl')
@@ -144,6 +144,10 @@ def scan_url(request):
         form = URLScanForm(request.POST)
         if form.is_valid():
             url = form.cleaned_data['url']
+            # Check if domain exists before proceeding
+            if not domain_exists(url):
+                messages.error(request, 'The domain does not exist or is unreachable. Please check the URL and try again.')
+                return render(request, 'scan_form.html', {'form': form, 'error_details': 'Domain does not exist.'})
             force_rescan = request.POST.get('force_rescan') == 'true'
             
             try:
@@ -205,10 +209,18 @@ def scan_url(request):
                         url_analysis = None
                     
                     # Create context
+                    if prediction is not None:
+                        if prediction:  # is_phishing == True
+                            display_confidence = confidence * 10
+                        else:
+                            display_confidence = (1 - confidence) * 10
+                    else:
+                        display_confidence = 0
+
                     context = {
                         'url': url,
                         'is_phishing': prediction,
-                        'confidence': confidence * 100,
+                        'confidence': display_confidence,  # Now out of 10
                         'analysis': url_analysis,
                         'report_path': report_path,
                         'from_cache': False

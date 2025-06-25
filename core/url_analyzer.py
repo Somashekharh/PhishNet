@@ -31,6 +31,20 @@ def check_internet_connection():
     except OSError:
         return False
 
+def domain_exists(url):
+    """Check if the domain in the URL exists (resolves via DNS)."""
+    try:
+        parsed = urlparse(url)
+        domain = parsed.netloc
+        if not domain:
+            return False
+        # Remove port if present
+        domain = domain.split(':')[0]
+        socket.gethostbyname(domain)
+        return True
+    except Exception:
+        return False
+
 class URLAnalyzer:
     def __init__(self):
         self.session = requests.Session()

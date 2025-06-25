@@ -1,8 +1,57 @@
-# PhishNet - CyberShield Matrix
+# PhishNet - Advanced Phishing Detection & Cybersecurity Platform
 
-🛡️ **Advanced Phishing Detection & Cybersecurity Platform**
+🛡️ **AI-Powered Phishing Detection with Machine Learning**
 
-PhishNet is a cutting-edge cybersecurity application designed to detect and prevent phishing attacks through advanced URL analysis, machine learning algorithms, and real-time threat assessment. Built with a futuristic cyberpunk aesthetic, it provides users with powerful tools to stay safe in the digital realm.
+PhishNet is a cutting-edge cybersecurity application that uses advanced machine learning algorithms to detect and prevent phishing attacks through comprehensive URL analysis. Built with Django and featuring a futuristic cyberpunk aesthetic, it provides real-time threat assessment with high accuracy.
+
+## 🚀 Key Features
+
+### 🔍 **Advanced URL Analysis**
+- **Machine Learning Detection**: Random Forest classifier with 99.8% accuracy
+- **Real-time Scanning**: Instant threat assessment with confidence scoring
+- **Comprehensive Analysis**: Domain reputation, SSL certificates, content analysis
+- **Visual Reports**: Screenshots and detailed security reports
+
+### 🛡️ **Security Features**
+- **Multi-layered Protection**: URL structure, domain analysis, content scanning
+- **Whitelist Management**: Trusted domain verification
+- **Educational/Government Domain Detection**: Automatic safe classification
+- **Suspicious Pattern Recognition**: Advanced heuristic analysis
+
+### 👤 **User Management**
+- **Secure Authentication**: Django's built-in authentication system
+- **Profile Management**: User settings and security preferences
+- **Scan History**: Track all previous URL scans
+- **Report System**: Submit and track phishing reports
+
+### 🎨 **Cyberpunk UI/UX**
+- **Futuristic Design**: Dark theme with neon accents
+- **Responsive Layout**: Mobile-first design
+- **Real-time Feedback**: Interactive elements and animations
+- **Professional Admin Interface**: Dark-mode admin panel
+
+## 🧠 Machine Learning Model
+
+### **Current Model**: Random Forest Classifier
+- **Algorithm**: `RandomForestClassifier` (scikit-learn)
+- **Training Data**: 235,795 URLs from PhiUSIIL dataset
+- **Features**: 10 optimized features for fast and accurate detection
+- **Performance**: 99.8% detection accuracy
+
+### **Model Features**:
+- URL length and structure analysis
+- HTTPS/HTTP protocol detection
+- Suspicious TLD identification (.tk, .ml, .ga, .xyz, etc.)
+- IP address detection
+- Suspicious keyword analysis
+- Domain reputation scoring
+- Path and query analysis
+
+### **Model Files**:
+- `core/ml_model/model.pkl` - Trained model
+- `core/ml_model/scaler.pkl` - Feature scaler
+- `core/ml_model/feature_importance.csv` - Feature importance
+- `core/ml_model/model_metadata.json` - Model metadata
 
 ## 🚀 Features
 

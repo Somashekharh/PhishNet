@@ -614,7 +614,7 @@
                             {% endif %}
                 </h2>
                 <div class="status-score">
-                                Confidence Score: <strong>{{ confidence|floatformat:1 }}%</strong>
+                                Confidence Score: <strong>{{ confidence|floatformat:1 }}/10</strong>
                             {% if from_cache %}
                     <span class="badge-cyber badge-info ms-3">Cached Result</span>
                             {% endif %}
@@ -641,7 +641,7 @@
                 <div class="metric-icon">
                     <i class="fas fa-shield-alt"></i>
                 </div>
-                <div class="metric-value">{{ confidence|floatformat:1 }}%</div>
+                <div class="metric-value">{{ confidence|floatformat:1 }}/10</div>
                 <div class="metric-label">Security Score</div>
             </div>
                                 </div>
