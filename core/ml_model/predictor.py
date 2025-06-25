@@ -101,85 +101,30 @@ class URLPredictor:
         return False
             
     def extract_features(self, url):
-        """Extract features from URL matching the new model's expected format."""
-        features = {
-            'url_length': 0,
-            'domain_length': 0,
-            'path_length': 0,
-            'has_at_symbol': False,
-            'has_double_slash': False,
-            'has_dash': False,
-            'has_multiple_dots': False,
-            'num_digits': 0,
-            'num_params': 0,
-            'num_fragments': 0,
-            'num_special_chars': 0,
-            'has_https': False,
-            'has_suspicious_tld': False,
-            'subdomain_count': 0,
-            'path_depth': 0,
-            'is_ip_address': False,
-            'num_subdomains': 0,
-            'has_port': False,
-            'has_suspicious_chars': False,
-            'domain_hyphens': 0,
-            'path_hyphens': 0,
-            'query_length': 0
-        }
-        
+        """Extract features from URL using simplified but effective approach."""
         try:
-            # Basic URL features
-            features['url_length'] = len(url)
             parsed_url = urlparse(url)
             domain = parsed_url.netloc
-            path = parsed_url.path
-            query = parsed_url.query
             
-            # Domain features
-            features['domain_length'] = len(domain)
-            features['has_at_symbol'] = '@' in domain
-            features['has_double_slash'] = '//' in url[8:]
-            features['has_dash'] = '-' in domain
-            features['has_multiple_dots'] = len(re.findall(r'\.', domain)) > 2
-            features['num_digits'] = sum(c.isdigit() for c in domain)
-            features['num_special_chars'] = len(re.findall(r'[^a-zA-Z0-9.]', domain))
+            features = {
+                'url_length': len(url),
+                'has_https': url.startswith('https://'),
+                'has_at_symbol': '@' in url,
+                'has_dash': '-' in domain,
+                'num_digits': sum(c.isdigit() for c in domain),
+                'has_suspicious_tld': any(domain.endswith(tld) for tld in ['.tk', '.ml', '.ga', '.xyz', '.work', '.men', '.date', '.click', '.loan', '.top', '.review', '.country', '.bid', '.win']),
+                'is_ip_address': bool(re.match(r'^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', domain)),
+                'has_suspicious_keywords': any(keyword in url.lower() for keyword in ['login', 'secure', 'verify', 'account', 'bank', 'paypal', 'facebook', 'google']),
+                'path_length': len(parsed_url.path),
+                'query_length': len(parsed_url.query)
+            }
             
-            # Enhanced domain analysis
-            domain_parts = domain.split('.')
-            features['subdomain_count'] = len(domain_parts) - 1
-            features['num_subdomains'] = max(0, len(domain_parts) - 2)
-            features['has_port'] = ':' in domain
-            features['domain_hyphens'] = domain.count('-')
-            
-            # Path features
-            features['path_length'] = len(path)
-            features['path_depth'] = path.count('/')
-            features['path_hyphens'] = path.count('-')
-            features['num_params'] = len(parsed_url.query.split('&')) if parsed_url.query else 0
-            features['num_fragments'] = 1 if parsed_url.fragment else 0
-            features['query_length'] = len(query)
-            
-            # Protocol and security features
-            features['has_https'] = url.startswith('https://')
-            
-            # Suspicious patterns - Updated to be less aggressive
-            suspicious_tlds = {'.tk', '.ml', '.ga', '.cf', '.gq', '.xyz', '.work', '.men', 
-                             '.date', '.click', '.loan', '.top', '.review', '.country', '.bid', '.win'}
-            features['has_suspicious_tld'] = any(domain.endswith(tld) for tld in suspicious_tlds)
-            
-            # Suspicious character patterns
-            suspicious_chars = {'$', '{', '}', '[', ']', '(', ')', '|', '=', '+', '*', '^'}
-            features['has_suspicious_chars'] = any(char in url for char in suspicious_chars)
-            
-            # IP address check
-            ip_pattern = r'^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
-            features['is_ip_address'] = bool(re.match(ip_pattern, domain))
+            return features
             
         except Exception as e:
             print(f"Error extracting features: {str(e)}")
             logger.error(f"Error extracting features: {str(e)}")
-        
-        return features
+            return None
         
     def predict(self, url):
         """Predict if a URL is phishing with improved logic for legitimate domains."""
@@ -201,12 +146,12 @@ class URLPredictor:
             if self.whitelist_manager:
                 if self.whitelist_manager.is_whitelisted(domain):
                     print(f"Domain {domain} found in whitelist - marking as safe")
-                    return False, 0.99  # Return safe with very high confidence
+                    return False, 0.01  # Return safe with very high confidence (1% phishing probability = 99% safe)
             else:
                 # Fallback to basic whitelist
                 if domain in self.legitimate_domains:
                     print(f"Domain {domain} found in whitelist - marking as safe")
-                    return False, 0.99  # Return safe with very high confidence
+                    return False, 0.01  # Return safe with very high confidence (1% phishing probability = 99% safe)
             
             # Check for legitimate educational or government domains
             is_legitimate_edu = self.is_legitimate_educational_domain(domain)
@@ -219,7 +164,7 @@ class URLPredictor:
                     print("Educational institution domain - marking as safe")
                 if is_legitimate_gov:
                     print("Government domain - marking as safe")
-                return False, 0.95  # Return safe with high confidence (95% safe)
+                return False, 0.05  # Return safe with high confidence (5% phishing probability = 95% safe)
                 
             # Extract features
             features = self.extract_features(url)

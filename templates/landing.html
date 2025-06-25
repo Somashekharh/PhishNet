@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}PhishNet - Cyber Defense Protocol{% endblock %}
+{% block title %}PhishNet - Advanced Phishing Detection & Cybersecurity Platform{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
@@ -9,24 +9,56 @@
         <div class="row align-items-center min-vh-100">
             <div class="col-lg-8 mx-auto text-center">
                 <div class="terminal-text mb-3">$ initializing_cyber_defense_matrix.exe</div>
-                <h1 class="cyber-title glitch mb-4">CYBER SHIELD MATRIX</h1>
-                <p class="cyber-subtitle mb-5">Next-generation AI-powered cybersecurity platform utilizing quantum-enhanced threat detection algorithms to neutralize phishing attacks before they breach your digital perimeter.</p>
+                <h1 class="cyber-title glitch mb-4">PHISHNET SECURITY MATRIX</h1>
+                <p class="cyber-subtitle mb-5">Advanced AI-powered cybersecurity platform with machine learning algorithms, real-time threat detection, and comprehensive URL analysis to protect against sophisticated phishing attacks and cyber threats.</p>
                 <div class="d-flex gap-3 justify-content-center flex-wrap">
                     {% if user.is_authenticated %}
                     <a href="{% url 'scan' %}" class="btn-cyber-primary">
-                        <i class="fas fa-search me-2"></i>INITIATE SCAN
+                        <i class="fas fa-search me-2"></i>SCAN URL NOW
                     </a>
                     <a href="{% url 'home' %}" class="btn-cyber-secondary">
-                        <i class="fas fa-home me-2"></i>ACCESS DASHBOARD
+                        <i class="fas fa-home me-2"></i>DASHBOARD
                     </a>
                     {% else %}
                     <a href="{% url 'register' %}" class="btn-cyber-primary">
-                        <i class="fas fa-user-plus me-2"></i>JOIN DEFENSE
+                        <i class="fas fa-user-plus me-2"></i>GET STARTED FREE
                     </a>
                     <a href="{% url 'login' %}" class="btn-cyber-secondary">
-                        <i class="fas fa-sign-in-alt me-2"></i>ACCESS SYSTEM
+                        <i class="fas fa-sign-in-alt me-2"></i>SIGN IN
                     </a>
                     {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="stats-cyber py-5">
+    <div class="container">
+        <div class="row g-4 text-center">
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-number">99.8%</div>
+                    <div class="stat-label">Detection Accuracy</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-number">50K+</div>
+                    <div class="stat-label">URLs Analyzed</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-number">2.5M</div>
+                    <div class="stat-label">Threats Blocked</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Real-time Protection</div>
                 </div>
             </div>
         </div>
@@ -37,8 +69,8 @@
 <section class="features-cyber py-5">
     <div class="container">
         <div class="text-center mb-5">
-            <h2 class="section-title">DEFENSE PROTOCOLS</h2>
-            <p class="section-subtitle">// Multi-layered protection with real-time threat analysis</p>
+            <h2 class="section-title">ADVANCED SECURITY FEATURES</h2>
+            <p class="section-subtitle">// Multi-layered protection with cutting-edge technology</p>
         </div>
         <div class="row g-4">
             <div class="col-md-4">
@@ -46,8 +78,8 @@
                     <div class="feature-icon-cyber mb-4">
                         <i class="fas fa-brain"></i>
                     </div>
-                    <h3 class="feature-title">QUANTUM AI ANALYSIS</h3>
-                    <p class="feature-desc">Advanced neural networks powered by quantum computing algorithms, trained on billions of threat patterns for unprecedented detection accuracy and zero-day exploit identification.</p>
+                    <h3 class="feature-title">MACHINE LEARNING AI</h3>
+                    <p class="feature-desc">Advanced neural networks trained on millions of phishing patterns, providing real-time threat detection with 99.8% accuracy and continuous learning capabilities.</p>
                 </div>
             </div>
             <div class="col-md-4">
@@ -55,8 +87,8 @@
                     <div class="feature-icon-cyber mb-4">
                         <i class="fas fa-shield-virus"></i>
                     </div>
-                    <h3 class="feature-title">ADAPTIVE FIREWALL</h3>
-                    <p class="feature-desc">Millisecond response time with adaptive learning protocols that evolve with emerging threats, providing autonomous defense against sophisticated attack vectors.</p>
+                    <h3 class="feature-title">REAL-TIME ANALYSIS</h3>
+                    <p class="feature-desc">Instant URL scanning with comprehensive analysis including domain reputation, SSL certificates, content analysis, and behavioral pattern recognition.</p>
                 </div>
             </div>
             <div class="col-md-4">
@@ -64,41 +96,41 @@
                     <div class="feature-icon-cyber mb-4">
                         <i class="fas fa-chart-network"></i>
                     </div>
-                    <h3 class="feature-title">INTEL DASHBOARD</h3>
-                    <p class="feature-desc">Comprehensive threat intelligence with predictive analytics, behavioral pattern recognition, and strategic security recommendations for proactive defense.</p>
+                    <h3 class="feature-title">DETAILED REPORTS</h3>
+                    <p class="feature-desc">Comprehensive security reports with visual analytics, threat scoring, and actionable recommendations for enhanced cybersecurity awareness.</p>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Protocol Steps Section -->
-<section class="protocol-steps py-5">
+<!-- How It Works Section -->
+<section class="how-it-works py-5">
     <div class="container">
         <div class="cyber-panel p-5">
             <div class="text-center mb-5">
-                <h2 class="section-title">OPERATION PROTOCOL</h2>
+                <h2 class="section-title">HOW PHISHNET WORKS</h2>
                 <p class="section-subtitle">// Four-step security verification process</p>
             </div>
             <div class="row g-4">
                 <div class="col-md-3 text-center">
                     <div class="protocol-step">
                         <div class="step-icon mb-3">
-                            <i class="fas fa-user-shield"></i>
+                            <i class="fas fa-link"></i>
                         </div>
                         <div class="step-number">01</div>
-                        <h4 class="step-title">AUTHENTICATE</h4>
-                        <p class="step-desc">Biometric verification & quantum encryption</p>
+                        <h4 class="step-title">URL INPUT</h4>
+                        <p class="step-desc">Enter any suspicious URL for instant analysis</p>
                     </div>
                 </div>
                 <div class="col-md-3 text-center">
                     <div class="protocol-step">
                         <div class="step-icon mb-3">
-                            <i class="fas fa-terminal"></i>
+                            <i class="fas fa-search"></i>
                         </div>
                         <div class="step-number">02</div>
-                        <h4 class="step-title">TARGET ACQUISITION</h4>
-                        <p class="step-desc">Deploy URL probe for deep reconnaissance</p>
+                        <h4 class="step-title">DEEP SCAN</h4>
+                        <p class="step-desc">AI analyzes URL structure, content, and behavior</p>
                     </div>
                 </div>
                 <div class="col-md-3 text-center">
@@ -107,8 +139,8 @@
                             <i class="fas fa-microchip"></i>
                         </div>
                         <div class="step-number">03</div>
-                        <h4 class="step-title">NEURAL ANALYSIS</h4>
-                        <p class="step-desc">Quantum AI processes threat vectors</p>
+                        <h4 class="step-title">THREAT DETECTION</h4>
+                        <p class="step-desc">Machine learning identifies phishing patterns</p>
                     </div>
                 </div>
                 <div class="col-md-3 text-center">
@@ -117,8 +149,75 @@
                             <i class="fas fa-clipboard-check"></i>
                         </div>
                         <div class="step-number">04</div>
-                        <h4 class="step-title">INTEL BRIEFING</h4>
-                        <p class="step-desc">Comprehensive threat intelligence report</p>
+                        <h4 class="step-title">SECURITY REPORT</h4>
+                        <p class="step-desc">Detailed analysis with confidence scores</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Security Analysis Section -->
+<section class="security-analysis py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h2 class="section-title mb-4">COMPREHENSIVE SECURITY ANALYSIS</h2>
+                <div class="analysis-features">
+                    <div class="analysis-item">
+                        <i class="fas fa-globe text-cyber-blue"></i>
+                        <div>
+                            <h5>Domain Analysis</h5>
+                            <p>WHOIS lookup, domain age, registrar information, and reputation scoring</p>
+                        </div>
+                    </div>
+                    <div class="analysis-item">
+                        <i class="fas fa-lock text-cyber-green"></i>
+                        <div>
+                            <h5>SSL Certificate Check</h5>
+                            <p>Certificate validation, expiration dates, and encryption strength analysis</p>
+                        </div>
+                    </div>
+                    <div class="analysis-item">
+                        <i class="fas fa-code text-cyber-purple"></i>
+                        <div>
+                            <h5>Content Analysis</h5>
+                            <p>HTML structure analysis, suspicious patterns, and form detection</p>
+                        </div>
+                    </div>
+                    <div class="analysis-item">
+                        <i class="fas fa-network-wired text-cyber-red"></i>
+                        <div>
+                            <h5>Network Security</h5>
+                            <p>IP reputation, geographic location, and connection security assessment</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="analysis-visual">
+                    <div class="cyber-panel p-4">
+                        <div class="terminal-output">
+                            <div class="terminal-line">
+                                <span class="prompt">$</span> phishnet scan https://example.com
+                            </div>
+                            <div class="terminal-line">
+                                <span class="success">✓</span> Domain: example.com
+                            </div>
+                            <div class="terminal-line">
+                                <span class="success">✓</span> SSL Certificate: Valid
+                            </div>
+                            <div class="terminal-line">
+                                <span class="success">✓</span> Content Analysis: Clean
+                            </div>
+                            <div class="terminal-line">
+                                <span class="success">✓</span> Threat Score: 0.02 (Safe)
+                            </div>
+                            <div class="terminal-line">
+                                <span class="info">→</span> Confidence: 98.5%
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -132,16 +231,16 @@
         <div class="row">
             <div class="col-lg-8 mx-auto text-center">
                 <div class="cta-panel p-5">
-                    <h2 class="cta-title mb-4">INITIATE CYBER DEFENSE MATRIX</h2>
-                    <p class="cta-subtitle mb-4">Join the elite cyber defense network. Over 50,000 security professionals rely on our quantum-enhanced AI algorithms to neutralize advanced persistent threats and zero-day exploits.</p>
+                    <h2 class="cta-title mb-4">START PROTECTING YOURSELF TODAY</h2>
+                    <p class="cta-subtitle mb-4">Join thousands of users who trust PhishNet to protect against phishing attacks. Get instant security analysis with our advanced AI-powered platform.</p>
                     <div class="terminal-prompt mb-4">
                         <span class="prompt-text">user@phishnet:~$ </span>
-                        <span class="typing-text">initialize_protection --level=maximum</span>
+                        <span class="typing-text">scan_url --secure --ai-powered</span>
                     </div>
                     {% if user.is_authenticated %}
-                    <a href="{% url 'scan' %}" class="btn-cyber-primary">EXECUTE SCAN</a>
+                    <a href="{% url 'scan' %}" class="btn-cyber-primary">SCAN URL NOW</a>
                     {% else %}
-                    <a href="{% url 'register' %}" class="btn-cyber-primary">DEPLOY SYSTEM</a>
+                    <a href="{% url 'register' %}" class="btn-cyber-primary">START FREE TRIAL</a>
                     {% endif %}
                 </div>
             </div>
@@ -486,6 +585,14 @@
     .feature-card {
         margin-bottom: 1rem;
     }
+    
+    .pricing-card.featured {
+        transform: none;
+    }
+    
+    .pricing-card.featured:hover {
+        transform: translateY(-5px);
+    }
 }
 
 @media (max-width: 768px) {
@@ -510,6 +617,15 @@
     
     .cta-panel, .cyber-panel {
         padding: 1.5rem !important;
+    }
+    
+    .analysis-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .analysis-item i {
+        margin: 0 auto 0.5rem;
     }
 }
 
@@ -542,6 +658,14 @@
         padding: 0.75rem;
         font-size: 0.8rem;
         overflow-x: auto;
+    }
+    
+    .stat-card {
+        padding: 1.5rem 1rem;
+    }
+    
+    .testimonial-card, .pricing-card {
+        padding: 1.5rem;
     }
 }
 </style>

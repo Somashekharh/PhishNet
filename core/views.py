@@ -173,22 +173,7 @@ def scan_url(request):
                     # Get prediction
                     try:
                         prediction, confidence = url_predictor.predict(url)
-                        
-                        # Only recalculate confidence if it's from ML model (not from whitelist/legitimate domains)
-                        # For legitimate domains, the predictor already returns the correct confidence
-                        if confidence < 0.9:  # If confidence is not from whitelist/legitimate domains
-                            # Get both class probabilities from ML model
-                            feature_vector = url_predictor.extract_features(url)
-                            if feature_vector:
-                                X = np.array([list(feature_vector.values())])
-                                X_scaled = url_predictor.scaler.transform(X)
-                                proba = url_predictor.model.predict_proba(X_scaled)[0]
-                                if prediction:
-                                    confidence = proba[1]  # Probability of phishing
-                                else:
-                                    confidence = proba[0]  # Probability of safe
-                            else:
-                                confidence = 0
+                        # Use confidence directly from predictor - no recalculation needed
                     except Exception as e:
                         print(f"Error making prediction: {str(e)}")
                         prediction = None
