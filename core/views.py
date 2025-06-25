@@ -145,14 +145,14 @@ def scan_url(request):
         if form.is_valid():
             url = form.cleaned_data['url']
             force_rescan = request.POST.get('force_rescan') == 'true'
-
+            
             try:
                 # Always clear cache if force rescan
                 cache_key = f'url_scan_{hashlib.md5(url.encode()).hexdigest()}'
                 if force_rescan:
                     cache.delete(cache_key)
                     messages.info(request, 'Performing fresh scan as requested.')
-
+                
                 # Try to get from cache
                 cached_result = None
                 if not force_rescan:
@@ -161,7 +161,7 @@ def scan_url(request):
                     except Exception as cache_error:
                         print(f"Cache retrieval error: {str(cache_error)}")
                         cached_result = None
-
+                
                 if cached_result and not force_rescan:
                     print("Using cached result")
                     cached_result['from_cache'] = True
@@ -173,23 +173,27 @@ def scan_url(request):
                     # Get prediction
                     try:
                         prediction, confidence = url_predictor.predict(url)
-                        # Get both class probabilities
-                        feature_vector = url_predictor.extract_features(url)
-                        if feature_vector:
-                            X = np.array([list(feature_vector.values())])
-                            X_scaled = url_predictor.scaler.transform(X)
-                            proba = url_predictor.model.predict_proba(X_scaled)[0]
-                            if prediction:
-                                confidence = proba[1]  # Probability of phishing
+                        
+                        # Only recalculate confidence if it's from ML model (not from whitelist/legitimate domains)
+                        # For legitimate domains, the predictor already returns the correct confidence
+                        if confidence < 0.9:  # If confidence is not from whitelist/legitimate domains
+                            # Get both class probabilities from ML model
+                            feature_vector = url_predictor.extract_features(url)
+                            if feature_vector:
+                                X = np.array([list(feature_vector.values())])
+                                X_scaled = url_predictor.scaler.transform(X)
+                                proba = url_predictor.model.predict_proba(X_scaled)[0]
+                                if prediction:
+                                    confidence = proba[1]  # Probability of phishing
+                                else:
+                                    confidence = proba[0]  # Probability of safe
                             else:
-                                confidence = proba[0]  # Probability of safe
-                        else:
-                            confidence = 0
+                                confidence = 0
                     except Exception as e:
                         print(f"Error making prediction: {str(e)}")
                         prediction = None
                         confidence = 0
-
+                    
                     # Debug print
                     print(f"DEBUG: Scan result for {url} -> is_phishing={prediction}, confidence={confidence*100:.2f}%")
 
@@ -199,7 +203,7 @@ def scan_url(request):
                             'form': form,
                             'error_details': 'Failed to analyze the URL. The URL might be invalid or inaccessible.'
                         })
-
+                    
                     # Get URL analysis
                     try:
                         print("Starting URL analysis...")
@@ -214,7 +218,7 @@ def scan_url(request):
                     except Exception as e:
                         print(f"URL analysis error: {str(e)}")
                         url_analysis = None
-
+                    
                     # Create context
                     context = {
                         'url': url,
@@ -224,7 +228,7 @@ def scan_url(request):
                         'report_path': report_path,
                         'from_cache': False
                     }
-
+                    
                     # Try to cache the result
                     try:
                         cache_data = clean_for_cache(context)
@@ -232,7 +236,7 @@ def scan_url(request):
                     except Exception as cache_error:
                         print(f"Cache storage error: {str(cache_error)}")
                         pass
-
+                    
                     # Save to database
                     URLScan.objects.create(
                         user=request.user,
@@ -241,9 +245,9 @@ def scan_url(request):
                         confidence_score=confidence,
                         scan_date=timezone.now()
                     )
-
+                
                 return render(request, 'scan_result.html', context)
-
+                
             except Exception as e:
                 print(f"Error during URL analysis: {str(e)}")
                 messages.error(request, 'An error occurred while analyzing the URL.')
@@ -253,7 +257,7 @@ def scan_url(request):
                 })
     else:
         form = URLScanForm()
-
+    
     return render(request, 'scan_form.html', {'form': form})
 
 @login_required

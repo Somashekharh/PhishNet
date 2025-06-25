@@ -1,6 +1,5 @@
 import os
 from datetime import datetime
-import pdfkit
 from django.template.loader import render_to_string
 from django.conf import settings
 import json
@@ -53,6 +52,18 @@ class ReportGenerator:
 
     def generate_pdf_report(self, url, analysis_results):
         try:
+            # Check if wkhtmltopdf is available
+            if not hasattr(settings, 'WKHTMLTOPDF_PATH') or not settings.WKHTMLTOPDF_PATH:
+                print("PDF generation skipped: wkhtmltopdf not available")
+                return None
+            
+            # Import pdfkit only if wkhtmltopdf is available
+            try:
+                import pdfkit
+            except ImportError:
+                print("PDF generation skipped: pdfkit not installed")
+                return None
+            
             # Create temp directory for report
             with tempfile.TemporaryDirectory() as temp_dir:
                 # Generate HTML content

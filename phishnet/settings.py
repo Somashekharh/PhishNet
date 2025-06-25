@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+import platform
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -156,7 +157,37 @@ else:
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # wkhtmltopdf configuration
-WKHTMLTOPDF_PATH = os.path.join(BASE_DIR, 'wkhtmltox.exe')
+# Try to find wkhtmltopdf in common locations
+def find_wkhtmltopdf():
+    """Find wkhtmltopdf executable path."""
+    # Common installation paths
+    possible_paths = [
+        os.path.join(BASE_DIR, 'wkhtmltox.exe'),  # Windows in project directory
+        'C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe',  # Windows default
+        'C:\\Program Files (x86)\\wkhtmltopdf\\bin\\wkhtmltopdf.exe',  # Windows 32-bit
+        '/usr/local/bin/wkhtmltopdf',  # Linux/Mac common
+        '/usr/bin/wkhtmltopdf',  # Linux system
+        '/opt/homebrew/bin/wkhtmltopdf',  # Mac Homebrew
+    ]
+    
+    for path in possible_paths:
+        if os.path.exists(path):
+            return path
+    
+    # Try to find in PATH
+    import shutil
+    wkhtmltopdf_path = shutil.which('wkhtmltopdf')
+    if wkhtmltopdf_path:
+        return wkhtmltopdf_path
+    
+    return None
+
+WKHTMLTOPDF_PATH = find_wkhtmltopdf()
+
+# If wkhtmltopdf is not available, PDF generation will be disabled
+if not WKHTMLTOPDF_PATH:
+    print("Warning: wkhtmltopdf not found. PDF report generation will be disabled.")
+    print("To enable PDF reports, install wkhtmltopdf from: https://wkhtmltopdf.org/downloads.html")
 
 # Cache configuration - using dummy cache for development to avoid admin issues
 CACHES = {

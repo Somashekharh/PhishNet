@@ -577,49 +577,49 @@
 
 {% block content %}
 <div class="result-container">
-    <!-- Header -->
+            <!-- Header -->
     <h1 class="cyber-title">URL Analysis Results</h1>
     <p class="cyber-subtitle">Advanced security analysis with machine learning detection</p>
 
-    <!-- URL Card -->
+            <!-- URL Card -->
     <div class="url-box">
         <div class="row">
             <div class="col-lg-8 mb-3 mb-lg-0">
                 <div class="url-label">Analyzed URL</div>
                 <a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="url-value">
-                    {{ url }}
-                    <i class="fas fa-external-link-alt ms-2 small"></i>
-                </a>
-            </div>
+                            {{ url }}
+                            <i class="fas fa-external-link-alt ms-2 small"></i>
+                        </a>
+                    </div>
             <div class="col-lg-4 d-flex align-items-end justify-content-lg-end">
-                {% if analysis.report_path %}
+                        {% if analysis.report_path %}
                 <a href="{{ analysis.report_path }}" class="btn btn-cyber" download>
-                    <i class="fas fa-file-pdf me-2"></i>Download Report
-                </a>
-                {% endif %}
+                            <i class="fas fa-file-pdf me-2"></i>Download Report
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Main Result -->
+            <!-- Main Result -->
     <div class="status-alert {% if is_phishing %}danger{% else %}safe{% endif %}">
         <div class="row align-items-center">
             <div class="col-md-8">
                 <h2 class="status-title {% if is_phishing %}danger{% else %}safe{% endif %}">
                     <i class="fas {% if is_phishing %}fa-exclamation-triangle{% else %}fa-shield-alt{% endif %} me-2"></i>
-                    {% if is_phishing %}
-                        Potential Phishing Website Detected
-                    {% else %}
-                        Safe Website
-                    {% endif %}
+                            {% if is_phishing %}
+                                Potential Phishing Website Detected
+                            {% else %}
+                                Safe Website
+                            {% endif %}
                 </h2>
                 <div class="status-score">
-                    Confidence Score: <strong>{{ confidence|floatformat:1 }}%</strong>
-                    {% if from_cache %}
+                                Confidence Score: <strong>{{ confidence|floatformat:1 }}%</strong>
+                            {% if from_cache %}
                     <span class="badge-cyber badge-info ms-3">Cached Result</span>
-                    {% endif %}
-                </div>
-            </div>
+                            {% endif %}
+                        </div>
+                    </div>
             <div class="col-md-4 text-md-end mt-3 mt-md-0">
                 <form method="post" action="{% url 'scan' %}" id="rescanForm">
                     {% csrf_token %}
@@ -644,12 +644,12 @@
                 <div class="metric-value">{{ confidence|floatformat:1 }}%</div>
                 <div class="metric-label">Security Score</div>
             </div>
-        </div>
+                                </div>
         <div class="col-md-3 col-6">
             <div class="metric-box">
                 <div class="metric-icon">
                     <i class="fas {% if analysis.security_info.uses_https|default:False %}fa-lock{% else %}fa-lock-open{% endif %}"></i>
-                </div>
+                            </div>
                 <div class="metric-value">
                     {% if analysis.security_info.uses_https|default:False %}
                         Secure
@@ -658,12 +658,12 @@
                     {% endif %}
                 </div>
                 <div class="metric-label">HTTPS Status</div>
-            </div>
-        </div>
+                                </div>
+                            </div>
         <div class="col-md-3 col-6">
             <div class="metric-box">
                 <div class="metric-icon">
-                    <i class="fas fa-certificate"></i>
+                                    <i class="fas fa-certificate"></i>
                 </div>
                 <div class="metric-value">
                     {% if analysis.ssl_info.has_expired|default:False %}
@@ -673,18 +673,18 @@
                     {% endif %}
                 </div>
                 <div class="metric-label">SSL Certificate</div>
-            </div>
-        </div>
+                                </div>
+                            </div>
         <div class="col-md-3 col-6">
             <div class="metric-box">
                 <div class="metric-icon">
-                    <i class="fas fa-link"></i>
-                </div>
+                                    <i class="fas fa-link"></i>
+                                </div>
                 <div class="metric-value">{{ analysis.content_info.external_links|default:"0" }}</div>
                 <div class="metric-label">External Links</div>
-            </div>
-        </div>
-    </div>
+                        </div>
+                    </div>
+                </div>
 
     <!-- Debug Information (temporary) -->
     <div class="cyber-card mb-4">
@@ -737,75 +737,75 @@
 
     <!-- Analysis Cards -->
     <div class="row g-4">
-        <!-- Domain Information -->
+                <!-- Domain Information -->
         <div class="col-lg-6">
             <div class="cyber-card">
                 <h3 class="card-title">
                     <i class="fas fa-globe me-2"></i>Domain Information
                 </h3>
                 <div class="cyber-list">
-                    {% if analysis.domain_info %}
-                        {% if analysis.domain_info.note %}
-                        <div class="cyber-list-item">
-                            <i class="fas fa-info-circle me-2" style="color: var(--cyber-blue);"></i>{{ analysis.domain_info.note }}
-                        </div>
-                        {% endif %}
-                        
-                        {% for key, value in analysis.domain_info.items %}
-                            {% if value and key != 'note' and key != 'error' %}
+                                {% if analysis.domain_info %}
+                                    {% if analysis.domain_info.note %}
+                            <div class="cyber-list-item">
+                                <i class="fas fa-info-circle me-2" style="color: var(--cyber-blue);"></i>{{ analysis.domain_info.note }}
+                                        </div>
+                                    {% endif %}
+                                    
+                                    {% for key, value in analysis.domain_info.items %}
+                                        {% if value and key != 'note' and key != 'error' %}
                             <div class="cyber-list-item">
                                 <div class="d-flex justify-content-between">
                                     <div class="item-label">{{ key|title|replace:"_" }}</div>
                                     <div class="item-value">
-                                        {% if key == 'name_servers' and value|length > 1 %}
-                                            <ul class="list-unstyled mb-0">
-                                                {% for server in value %}
-                                                    <li>{{ server }}</li>
-                                                {% endfor %}
-                                            </ul>
-                                        {% else %}
-                                            {{ value }}
-                                        {% endif %}
+                                                    {% if key == 'name_servers' and value|length > 1 %}
+                                                        <ul class="list-unstyled mb-0">
+                                                            {% for server in value %}
+                                                                <li>{{ server }}</li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    {% else %}
+                                                        {{ value }}
+                                                    {% endif %}
                                     </div>
-                                </div>
-                            </div>
-                            {% endif %}
-                        {% endfor %}
-                        
-                        {% if analysis.domain_info.error %}
-                        <div class="cyber-list-item" style="color: var(--cyber-red);">
-                            <i class="fas fa-exclamation-circle me-2"></i>{{ analysis.domain_info.error }}
-                        </div>
-                        {% endif %}
-                    {% else %}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    {% if analysis.domain_info.error %}
+                            <div class="cyber-list-item" style="color: var(--cyber-red);">
+                                            <i class="fas fa-exclamation-circle me-2"></i>{{ analysis.domain_info.error }}
+                                        </div>
+                                    {% endif %}
+                                {% else %}
                         <div class="cyber-list-item text-center py-4">
                             <i class="fas fa-info-circle mb-3" style="font-size: 2rem; color: var(--text-secondary);"></i>
                             <p class="mb-0" style="color: var(--text-secondary);">No domain information available</p>
+                                    </div>
+                                {% endif %}
                         </div>
-                    {% endif %}
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Security Information -->
+                <!-- Security Information -->
         <div class="col-lg-6">
             <div class="cyber-card">
                 <h3 class="card-title">
                     <i class="fas fa-shield-alt me-2"></i>Security Analysis
                 </h3>
                 <div class="cyber-list">
-                    {% if analysis.security_info %}
-                        {% for key, value in analysis.security_info.items %}
+                                {% if analysis.security_info %}
+                                    {% for key, value in analysis.security_info.items %}
                             {% if value is not None %}
                             <div class="cyber-list-item">
                                 <div class="d-flex justify-content-between">
                                     <div class="item-label">{{ key|title|replace:"_" }}</div>
                                     <div class="item-value">
                                         <span class="badge-cyber {% if value %}badge-success{% else %}badge-danger{% endif %}">
-                                            {{ value|yesno:"Yes,No" }}
-                                        </span>
-                                    </div>
-                                </div>
+                                                    {{ value|yesno:"Yes,No" }}
+                                                </span>
+                                            </div>
+                                        </div>
                             </div>
                             {% endif %}
                         {% endfor %}
@@ -816,93 +816,93 @@
                         </div>
                     {% endif %}
                 </div>
-            </div>
-        </div>
+                    </div>
+                </div>
 
-        <!-- SSL Certificate -->
+                <!-- SSL Certificate -->
         <div class="col-lg-6">
             <div class="cyber-card">
                 <h3 class="card-title">
                     <i class="fas fa-lock me-2"></i>SSL Certificate
                 </h3>
                 <div class="cyber-list">
-                    {% if analysis.ssl_info %}
-                        {% for key, value in analysis.ssl_info.items %}
+                                {% if analysis.ssl_info %}
+                                    {% for key, value in analysis.ssl_info.items %}
                             {% if value and key != 'error' %}
                             <div class="cyber-list-item">
                                 <div class="d-flex justify-content-between">
                                     <div class="item-label">{{ key|title|replace:"_" }}</div>
                                     <div class="item-value">
-                                        {% if key == 'issuer' or key == 'subject' %}
-                                            {% for k, v in value.items %}
-                                                {{ k }}={{ v }}{% if not forloop.last %}, {% endif %}
-                                            {% endfor %}
-                                        {% else %}
-                                            {{ value }}
-                                        {% endif %}
+                                                    {% if key == 'issuer' or key == 'subject' %}
+                                                        {% for k, v in value.items %}
+                                                            {{ k }}={{ v }}{% if not forloop.last %}, {% endif %}
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        {{ value }}
+                                                    {% endif %}
                                     </div>
-                                </div>
-                            </div>
-                            {% endif %}
-                        {% endfor %}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
                         
                         {% if analysis.ssl_info.error %}
                         <div class="cyber-list-item" style="color: var(--cyber-red);">
                             <i class="fas fa-exclamation-circle me-2"></i>{{ analysis.ssl_info.error }}
                         </div>
                         {% endif %}
-                    {% else %}
+                                {% else %}
                         <div class="cyber-list-item text-center py-4">
                             <i class="fas fa-lock mb-3" style="font-size: 2rem; color: var(--text-secondary);"></i>
                             <p class="mb-0" style="color: var(--text-secondary);">No SSL certificate information available</p>
                         </div>
-                    {% endif %}
+                                {% endif %}
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Content Analysis -->
+                <!-- Content Analysis -->
         <div class="col-lg-6">
             <div class="cyber-card">
                 <h3 class="card-title">
                     <i class="fas fa-file-alt me-2"></i>Content Analysis
                 </h3>
                 <div class="cyber-list">
-                    {% if analysis.content_info %}
-                        {% for key, value in analysis.content_info.items %}
+                                {% if analysis.content_info %}
+                                    {% for key, value in analysis.content_info.items %}
                             {% if value and key != 'error' %}
                             <div class="cyber-list-item">
                                 <div class="d-flex justify-content-between">
                                     <div class="item-label">{{ key|title|replace:"_" }}</div>
                                     <div class="item-value">{{ value }}</div>
-                                </div>
-                            </div>
-                            {% endif %}
-                        {% endfor %}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
                         
                         {% if analysis.content_info.error %}
                         <div class="cyber-list-item" style="color: var(--cyber-red);">
                             <i class="fas fa-exclamation-circle me-2"></i>{{ analysis.content_info.error }}
                         </div>
                         {% endif %}
-                    {% else %}
+                                {% else %}
                         <div class="cyber-list-item text-center py-4">
                             <i class="fas fa-file-alt mb-3" style="font-size: 2rem; color: var(--text-secondary);"></i>
                             <p class="mb-0" style="color: var(--text-secondary);">No content information available</p>
                         </div>
-                    {% endif %}
+                                {% endif %}
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Screenshot -->
-        {% if analysis.screenshot_path %}
-        <div class="col-12">
+                <!-- Screenshot -->
+                {% if analysis.screenshot_path %}
+                <div class="col-12">
             <div class="cyber-card">
                 <h3 class="card-title">
                     <i class="fas fa-image me-2"></i>Website Screenshot
                 </h3>
-                <div class="screenshot-container">
+                            <div class="screenshot-container">
                     <div class="screenshot-terminal-header">
                         <div class="terminal-controls">
                             <span class="terminal-dot"></span>

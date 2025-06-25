@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishNet Security Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #007bff;
+            margin: 0;
+        }
+        .section {
+            margin-bottom: 25px;
+            page-break-inside: avoid;
+        }
+        .section h2 {
+            color: #007bff;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .info-item {
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .error {
+            color: #dc3545;
+            background-color: #f8d7da;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #f5c6cb;
+        }
+        .success {
+            color: #155724;
+            background-color: #d4edda;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #c3e6cb;
+        }
+        .warning {
+            color: #856404;
+            background-color: #fff3cd;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ffeaa7;
+        }
+        .redirect-chain {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .redirect-item {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+        @media print {
+            body { margin: 10px; }
+            .section { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔒 PhishNet Security Report</h1>
+        <p><strong>URL Analyzed:</strong> {{ url }}</p>
+        <p><strong>Analysis Date:</strong> {{ analysis_date }}</p>
+    </div>
+
+    <!-- Domain Information -->
+    <div class="section">
+        <h2>🌐 Domain Information</h2>
+        {% if analysis.domain_info %}
+            {% if analysis.domain_info.error %}
+                <div class="error">
+                    <strong>Error:</strong> {{ analysis.domain_info.error }}
+                </div>
+            {% else %}
+                <div class="info-grid">
+                    {% for key, value in analysis.domain_info.items %}
+                        {% if value and key != 'error' %}
+                            <div class="info-item">
+                                <span class="info-label">{{ key|title }}:</span> {{ value }}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="warning">No domain information available</div>
+        {% endif %}
+    </div>
+
+    <!-- Security Information -->
+    <div class="section">
+        <h2>🛡️ Security Analysis</h2>
+        {% if analysis.security_info %}
+            {% if analysis.security_info.error %}
+                <div class="error">
+                    <strong>Error:</strong> {{ analysis.security_info.error }}
+                </div>
+            {% else %}
+                <div class="info-grid">
+                    {% for key, value in analysis.security_info.items %}
+                        {% if value is not None and key != 'error' %}
+                            <div class="info-item">
+                                <span class="info-label">{{ key|title }}:</span> 
+                                {% if value == True %}
+                                    ✅ Yes
+                                {% elif value == False %}
+                                    ❌ No
+                                {% else %}
+                                    {{ value }}
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="warning">No security information available</div>
+        {% endif %}
+    </div>
+
+    <!-- SSL Certificate Information -->
+    <div class="section">
+        <h2>🔐 SSL Certificate</h2>
+        {% if analysis.ssl_info %}
+            {% if analysis.ssl_info.error %}
+                <div class="error">
+                    <strong>Error:</strong> {{ analysis.ssl_info.error }}
+                </div>
+            {% else %}
+                <div class="info-grid">
+                    {% for key, value in analysis.ssl_info.items %}
+                        {% if value and key != 'error' %}
+                            <div class="info-item">
+                                <span class="info-label">{{ key|title }}:</span> {{ value }}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="warning">No SSL information available</div>
+        {% endif %}
+    </div>
+
+    <!-- Content Analysis -->
+    <div class="section">
+        <h2>📄 Content Analysis</h2>
+        {% if analysis.content_info %}
+            {% if analysis.content_info.error %}
+                <div class="error">
+                    <strong>Error:</strong> {{ analysis.content_info.error }}
+                </div>
+            {% else %}
+                <div class="info-grid">
+                    {% for key, value in analysis.content_info.items %}
+                        {% if value and key != 'error' %}
+                            <div class="info-item">
+                                <span class="info-label">{{ key|title }}:</span> {{ value }}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="warning">No content information available</div>
+        {% endif %}
+    </div>
+
+    <!-- HTTP Headers -->
+    <div class="section">
+        <h2>📋 HTTP Headers</h2>
+        {% if analysis.headers %}
+            {% if analysis.headers.error %}
+                <div class="error">
+                    <strong>Error:</strong> {{ analysis.headers.error }}
+                </div>
+            {% else %}
+                <div class="info-grid">
+                    {% for key, value in analysis.headers.items %}
+                        {% if value and key != 'error' %}
+                            <div class="info-item">
+                                <span class="info-label">{{ key|title }}:</span> {{ value }}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="warning">No header information available</div>
+        {% endif %}
+    </div>
+
+    <!-- Redirect Chain -->
+    <div class="section">
+        <h2>🔄 Redirect Chain</h2>
+        {% if analysis.redirect_chain %}
+            {% if analysis.redirect_chain|length > 0 %}
+                <div class="redirect-chain">
+                    <strong>Number of redirects:</strong> {{ analysis.redirect_chain|length }}
+                    {% for redirect in analysis.redirect_chain %}
+                        <div class="redirect-item">
+                            {{ forloop.counter }}. {{ redirect }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="success">✅ No redirects detected</div>
+            {% endif %}
+        {% else %}
+            <div class="warning">No redirect information available</div>
+        {% endif %}
+    </div>
+
+    <!-- Screenshot Information -->
+    <div class="section">
+        <h2>📸 Screenshot</h2>
+        {% if analysis.screenshot_path %}
+            <div class="success">
+                ✅ Screenshot captured successfully
+                <br><small>Path: {{ analysis.screenshot_path }}</small>
+            </div>
+        {% else %}
+            <div class="warning">⚠️ Screenshot not available</div>
+        {% endif %}
+    </div>
+
+    <div class="footer">
+        <p><strong>Generated by PhishNet Security Platform</strong></p>
+        <p>This report is for informational purposes only. Always exercise caution when visiting unknown websites.</p>
+    </div>
+</body>
+</html> 

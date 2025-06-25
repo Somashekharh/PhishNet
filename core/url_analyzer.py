@@ -112,12 +112,22 @@ class URLAnalyzer:
                 domain = domain[4:]
             
             # First, check if domain resolves
+            ip_addresses = []
             try:
                 dns_info = dns.resolver.resolve(domain, 'A')
                 ip_addresses = [str(ip) for ip in dns_info]
+                logger.info(f"Domain {domain} resolves to: {ip_addresses}")
             except Exception as dns_error:
                 logger.error(f"DNS lookup failed: {str(dns_error)}")
-                ip_addresses = []
+                # Return basic info with DNS error
+                return {
+                    'domain': domain,
+                    'is_subdomain': len(domain.split('.')) > 2,
+                    'tld': domain.split('.')[-1],
+                    'domain_length': len(domain),
+                    'dns_error': f"Domain does not resolve: {str(dns_error)}",
+                    'note': "Domain appears to be unreachable or non-existent"
+                }
             
             # Try to get WHOIS information
             try:
@@ -200,10 +210,10 @@ class URLAnalyzer:
                 }
                 
         except Exception as e:
-            logger.error(f"Error getting domain info: {str(e)}")
+            logger.error(f"Error in domain info extraction: {str(e)}")
             return {
-                'error': str(e),
-                'note': "Could not retrieve domain information"
+                'error': f"Failed to extract domain information: {str(e)}",
+                'domain': urlparse(url).netloc if url else 'unknown'
             }
             
     def _get_security_info(self, url):
@@ -228,6 +238,21 @@ class URLAnalyzer:
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
             }
+            
+            # First check if domain resolves
+            parsed_url = urlparse(url)
+            domain = parsed_url.netloc
+            
+            try:
+                # Test DNS resolution first
+                socket.gethostbyname(domain)
+            except socket.gaierror as dns_error:
+                logger.error(f"DNS resolution failed for {domain}: {str(dns_error)}")
+                return {
+                    'error': f"Domain '{domain}' does not resolve. The website may be down or the domain may not exist.",
+                    'dns_error': str(dns_error)
+                }
+            
             response = self.session.get(url, headers=headers, timeout=self.timeout, verify=False)
             soup = BeautifulSoup(response.text, 'html.parser')
             
@@ -253,24 +278,42 @@ class URLAnalyzer:
                 'has_favicon': bool(soup.find('link', rel='icon') or soup.find('link', rel='shortcut icon')),
                 'content_type': response.headers.get('Content-Type'),
                 'content_length': len(response.content),
-                'response_time': response.elapsed.total_seconds()
+                'response_time': response.elapsed.total_seconds(),
+                'status_code': response.status_code
             }
             
             # Clean all values for JSON serialization
             return {k: clean_value(v) for k, v in info.items()}
             
+        except requests.exceptions.ConnectTimeout:
+            logger.error(f"Connection timeout for {url}")
+            return {'error': f"Connection timeout. The website took too long to respond."}
+        except requests.exceptions.ConnectionError as e:
+            logger.error(f"Connection error for {url}: {str(e)}")
+            return {'error': f"Connection failed. The website may be down or unreachable."}
         except requests.exceptions.RequestException as e:
-            logger.error(f"Error analyzing content: {str(e)}")
+            logger.error(f"Request error for {url}: {str(e)}")
             return {'error': f"Failed to fetch content: {str(e)}"}
         except Exception as e:
-            logger.error(f"Error analyzing content: {str(e)}")
-            return {'error': str(e)}
+            logger.error(f"Unexpected error analyzing content for {url}: {str(e)}")
+            return {'error': f"Unexpected error: {str(e)}"}
             
     def _capture_screenshot(self, url):
         """Capture a screenshot of the webpage using Playwright."""
         logger.info(f"Starting screenshot capture for URL: {url}")
         
         try:
+            # First check if domain resolves
+            parsed_url = urlparse(url)
+            domain = parsed_url.netloc
+            
+            try:
+                # Test DNS resolution first
+                socket.gethostbyname(domain)
+            except socket.gaierror as dns_error:
+                logger.error(f"DNS resolution failed for {domain}: {str(dns_error)}")
+                return None
+            
             # Create directories
             media_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'media')
             screenshots_dir = os.path.join(media_dir, 'screenshots')
@@ -353,8 +396,25 @@ class URLAnalyzer:
         """Analyze URL redirects."""
         logger.info("Analyzing redirects")
         try:
-            response = self.session.get(url, allow_redirects=True, verify=False)
+            # First check if domain resolves
+            parsed_url = urlparse(url)
+            domain = parsed_url.netloc
+            
+            try:
+                # Test DNS resolution first
+                socket.gethostbyname(domain)
+            except socket.gaierror as dns_error:
+                logger.error(f"DNS resolution failed for {domain}: {str(dns_error)}")
+                return []
+            
+            response = self.session.get(url, allow_redirects=True, verify=False, timeout=self.timeout)
             return [r.url for r in response.history] + [response.url]
+        except requests.exceptions.ConnectTimeout:
+            logger.error(f"Connection timeout for {url}")
+            return []
+        except requests.exceptions.ConnectionError as e:
+            logger.error(f"Connection error for {url}: {str(e)}")
+            return []
         except Exception as e:
             logger.error(f"Error analyzing redirects: {str(e)}")
             return []
@@ -366,12 +426,19 @@ class URLAnalyzer:
             parsed_url = urlparse(url)
             hostname = parsed_url.netloc
             
+            # First check if domain resolves
+            try:
+                socket.gethostbyname(hostname)
+            except socket.gaierror as dns_error:
+                logger.error(f"DNS resolution failed for {hostname}: {str(dns_error)}")
+                return {'error': f"Domain '{hostname}' does not resolve. Cannot check SSL certificate."}
+            
             # Create an SSL context
             context = ssl.create_default_context()
             context.check_hostname = False
             context.verify_mode = ssl.CERT_NONE
             
-            with socket.create_connection((hostname, 443)) as sock:
+            with socket.create_connection((hostname, 443), timeout=10) as sock:
                 with context.wrap_socket(sock, server_hostname=hostname) as ssock:
                     cert = ssock.getpeercert(binary_form=True)
                     x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_ASN1, cert)
@@ -411,23 +478,41 @@ class URLAnalyzer:
                         'serial_number': str(x509.get_serial_number()),
                         'not_before': x509.get_notBefore().decode(),
                         'not_after': x509.get_notAfter().decode(),
-                        'has_expired': x509.has_expired()
+                        'signature_algorithm': x509.get_signature_algorithm().decode()
                     }
                     
                     # Clean all values for JSON serialization
                     return {k: clean_value(v) for k, v in info.items()}
                     
+        except socket.timeout:
+            logger.error(f"SSL connection timeout for {url}")
+            return {'error': 'SSL connection timeout'}
+        except socket.gaierror as e:
+            logger.error(f"SSL DNS error for {url}: {str(e)}")
+            return {'error': f'DNS resolution failed: {str(e)}'}
         except Exception as e:
             logger.error(f"Error getting SSL info: {str(e)}")
             return {'error': str(e)}
             
     def _get_headers(self, url):
-        """Get HTTP headers."""
+        """Get HTTP headers information."""
         logger.info("Getting HTTP headers")
         try:
-            response = self.session.get(url, verify=False)
-            # Convert headers to dict and clean values
-            headers = dict(response.headers)
+            # First check if domain resolves
+            parsed_url = urlparse(url)
+            domain = parsed_url.netloc
+            
+            try:
+                # Test DNS resolution first
+                socket.gethostbyname(domain)
+            except socket.gaierror as dns_error:
+                logger.error(f"DNS resolution failed for {domain}: {str(dns_error)}")
+                return {'error': f"Domain '{domain}' does not resolve. Cannot fetch headers."}
+            
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
+            response = self.session.head(url, headers=headers, timeout=self.timeout, verify=False)
             
             # Helper function to clean values for JSON serialization
             def clean_value(value):
@@ -442,9 +527,16 @@ class URLAnalyzer:
                 else:
                     return str(value)
             
-            # Clean all values for JSON serialization
-            return {k: clean_value(v) for k, v in headers.items()}
+            # Convert headers to dict and clean
+            headers_dict = dict(response.headers)
+            return {k: clean_value(v) for k, v in headers_dict.items()}
             
+        except requests.exceptions.ConnectTimeout:
+            logger.error(f"Connection timeout for {url}")
+            return {'error': 'Connection timeout'}
+        except requests.exceptions.ConnectionError as e:
+            logger.error(f"Connection error for {url}: {str(e)}")
+            return {'error': f'Connection failed: {str(e)}'}
         except Exception as e:
             logger.error(f"Error getting headers: {str(e)}")
             return {'error': str(e)}
