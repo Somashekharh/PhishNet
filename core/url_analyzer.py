@@ -42,7 +42,11 @@ def domain_exists(url):
         domain = domain.split(':')[0]
         socket.gethostbyname(domain)
         return True
-    except Exception:
+    except socket.gaierror as e:
+        logger.warning(f"DNS resolution failed for {domain}: {str(e)}")
+        return False
+    except Exception as e:
+        logger.warning(f"Domain check failed for {domain}: {str(e)}")
         return False
 
 class URLAnalyzer:
@@ -131,15 +135,45 @@ class URLAnalyzer:
                 dns_info = dns.resolver.resolve(domain, 'A')
                 ip_addresses = [str(ip) for ip in dns_info]
                 logger.info(f"Domain {domain} resolves to: {ip_addresses}")
+            except dns.resolver.NXDOMAIN:
+                logger.warning(f"Domain {domain} does not exist (NXDOMAIN)")
+                return {
+                    'domain': domain,
+                    'is_subdomain': len(domain.split('.')) > 2,
+                    'tld': domain.split('.')[-1],
+                    'domain_length': len(domain),
+                    'dns_error': 'Domain does not exist',
+                    'note': "This domain appears to be non-existent or has been taken down"
+                }
+            except dns.resolver.NoAnswer:
+                logger.warning(f"No DNS answer for domain {domain}")
+                return {
+                    'domain': domain,
+                    'is_subdomain': len(domain.split('.')) > 2,
+                    'tld': domain.split('.')[-1],
+                    'domain_length': len(domain),
+                    'dns_error': 'No DNS records found',
+                    'note': "Domain exists but has no DNS records"
+                }
+            except dns.resolver.Timeout:
+                logger.warning(f"DNS timeout for domain {domain}")
+                return {
+                    'domain': domain,
+                    'is_subdomain': len(domain.split('.')) > 2,
+                    'tld': domain.split('.')[-1],
+                    'domain_length': len(domain),
+                    'dns_error': 'DNS resolution timeout',
+                    'note': "DNS resolution timed out - domain may be unreachable"
+                }
             except Exception as dns_error:
-                logger.error(f"DNS lookup failed: {str(dns_error)}")
+                logger.error(f"DNS lookup failed for {domain}: {str(dns_error)}")
                 # Return basic info with DNS error
                 return {
                     'domain': domain,
                     'is_subdomain': len(domain.split('.')) > 2,
                     'tld': domain.split('.')[-1],
                     'domain_length': len(domain),
-                    'dns_error': f"Domain does not resolve: {str(dns_error)}",
+                    'dns_error': f"DNS resolution failed: {str(dns_error)}",
                     'note': "Domain appears to be unreachable or non-existent"
                 }
             
@@ -261,11 +295,28 @@ class URLAnalyzer:
                 # Test DNS resolution first
                 socket.gethostbyname(domain)
             except socket.gaierror as dns_error:
-                logger.error(f"DNS resolution failed for {domain}: {str(dns_error)}")
-                return {
-                    'error': f"Domain '{domain}' does not resolve. The website may be down or the domain may not exist.",
-                    'dns_error': str(dns_error)
-                }
+                error_msg = str(dns_error)
+                if "Name or service not known" in error_msg:
+                    logger.error(f"Domain '{domain}' does not exist or is unreachable")
+                    return {
+                        'error': f"Domain '{domain}' does not exist or is unreachable.",
+                        'dns_error': 'Domain not found',
+                        'note': 'This domain appears to be non-existent or has been taken down.'
+                    }
+                elif "Temporary failure in name resolution" in error_msg:
+                    logger.error(f"Temporary DNS failure for domain '{domain}'")
+                    return {
+                        'error': f"Temporary DNS resolution failure for '{domain}'.",
+                        'dns_error': 'Temporary DNS failure',
+                        'note': 'DNS resolution temporarily failed. Please try again later.'
+                    }
+                else:
+                    logger.error(f"DNS resolution failed for {domain}: {error_msg}")
+                    return {
+                        'error': f"Domain '{domain}' cannot be resolved: {error_msg}",
+                        'dns_error': error_msg,
+                        'note': 'The domain may be down, unreachable, or non-existent.'
+                    }
             
             response = self.session.get(url, headers=headers, timeout=self.timeout, verify=False)
             soup = BeautifulSoup(response.text, 'html.parser')
@@ -325,7 +376,14 @@ class URLAnalyzer:
                 # Test DNS resolution first
                 socket.gethostbyname(domain)
             except socket.gaierror as dns_error:
-                logger.error(f"DNS resolution failed for {domain}: {str(dns_error)}")
+                error_msg = str(dns_error)
+                logger.error(f"DNS resolution failed for {domain}: {error_msg}")
+                if "Name or service not known" in error_msg:
+                    logger.warning(f"Cannot capture screenshot - domain '{domain}' does not exist")
+                elif "Temporary failure in name resolution" in error_msg:
+                    logger.warning(f"Cannot capture screenshot - temporary DNS failure for '{domain}'")
+                else:
+                    logger.warning(f"Cannot capture screenshot - DNS resolution failed for '{domain}'")
                 return None
             
             # Create directories
@@ -418,7 +476,14 @@ class URLAnalyzer:
                 # Test DNS resolution first
                 socket.gethostbyname(domain)
             except socket.gaierror as dns_error:
-                logger.error(f"DNS resolution failed for {domain}: {str(dns_error)}")
+                error_msg = str(dns_error)
+                logger.error(f"DNS resolution failed for {domain}: {error_msg}")
+                if "Name or service not known" in error_msg:
+                    logger.warning(f"Cannot analyze redirects - domain '{domain}' does not exist")
+                elif "Temporary failure in name resolution" in error_msg:
+                    logger.warning(f"Cannot analyze redirects - temporary DNS failure for '{domain}'")
+                else:
+                    logger.warning(f"Cannot analyze redirects - DNS resolution failed for '{domain}'")
                 return []
             
             response = self.session.get(url, allow_redirects=True, verify=False, timeout=self.timeout)
@@ -444,8 +509,14 @@ class URLAnalyzer:
             try:
                 socket.gethostbyname(hostname)
             except socket.gaierror as dns_error:
-                logger.error(f"DNS resolution failed for {hostname}: {str(dns_error)}")
-                return {'error': f"Domain '{hostname}' does not resolve. Cannot check SSL certificate."}
+                error_msg = str(dns_error)
+                logger.error(f"DNS resolution failed for {hostname}: {error_msg}")
+                if "Name or service not known" in error_msg:
+                    return {'error': f"Domain '{hostname}' does not exist or is unreachable. Cannot check SSL certificate."}
+                elif "Temporary failure in name resolution" in error_msg:
+                    return {'error': f"Temporary DNS failure for '{hostname}'. Cannot check SSL certificate."}
+                else:
+                    return {'error': f"DNS resolution failed for '{hostname}': {error_msg}. Cannot check SSL certificate."}
             
             # Create an SSL context
             context = ssl.create_default_context()
@@ -520,8 +591,14 @@ class URLAnalyzer:
                 # Test DNS resolution first
                 socket.gethostbyname(domain)
             except socket.gaierror as dns_error:
-                logger.error(f"DNS resolution failed for {domain}: {str(dns_error)}")
-                return {'error': f"Domain '{domain}' does not resolve. Cannot fetch headers."}
+                error_msg = str(dns_error)
+                logger.error(f"DNS resolution failed for {domain}: {error_msg}")
+                if "Name or service not known" in error_msg:
+                    return {'error': f"Domain '{domain}' does not exist or is unreachable. Cannot fetch headers."}
+                elif "Temporary failure in name resolution" in error_msg:
+                    return {'error': f"Temporary DNS failure for '{domain}'. Cannot fetch headers."}
+                else:
+                    return {'error': f"DNS resolution failed for '{domain}': {error_msg}. Cannot fetch headers."}
             
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'

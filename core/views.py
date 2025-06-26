@@ -12,6 +12,7 @@ import hashlib
 from django.http import JsonResponse, FileResponse
 import json
 import numpy as np
+import validators
 
 from .forms import UserRegistrationForm, URLScanForm, ReportForm, ContactForm
 from .models import URLScan, Report, Contact
@@ -171,6 +172,19 @@ def scan_url(request):
                     cached_result['from_cache'] = True
                     context = cached_result
                     messages.info(request, 'Retrieved from cache. Use the "Rescan" button for a fresh analysis.')
+                    
+                    # Save to database even for cached results
+                    try:
+                        URLScan.objects.create(
+                            user=request.user,
+                            url=url,
+                            is_phishing=cached_result['is_phishing'],
+                            confidence_score=cached_result['confidence'] / 10,  # Convert back to 0-1 scale
+                            scan_date=timezone.now()
+                        )
+                        print(f"Saved cached scan result to database for {url}")
+                    except Exception as db_error:
+                        print(f"Database save error for cached result: {str(db_error)}")
                 else:
                     # Always reload model and scaler to avoid stale files
                     url_predictor.load_model()
@@ -235,13 +249,18 @@ def scan_url(request):
                         pass
                     
                     # Save to database
-                    URLScan.objects.create(
-                        user=request.user,
-                        url=url,
-                        is_phishing=prediction,
-                        confidence_score=confidence,
-                        scan_date=timezone.now()
-                    )
+                    try:
+                        scan_record = URLScan.objects.create(
+                            user=request.user,
+                            url=url,
+                            is_phishing=prediction,
+                            confidence_score=confidence,
+                            scan_date=timezone.now()
+                        )
+                        print(f"Saved new scan result to database: ID={scan_record.id}, URL={url}, Phishing={prediction}")
+                    except Exception as db_error:
+                        print(f"Database save error for new scan: {str(db_error)}")
+                        # Continue without failing the scan
                 
                 return render(request, 'scan_result.html', context)
                 
@@ -369,6 +388,7 @@ def review_report(request, report_id):
     
     return render(request, 'review_report.html', {'report': report})
 
+@login_required
 def analyze_url(request):
     if request.method == 'POST':
         try:
@@ -377,6 +397,10 @@ def analyze_url(request):
             
             if not url:
                 return JsonResponse({'error': 'URL is required'}, status=400)
+            
+            # Validate URL format
+            if not validators.url(url):
+                return JsonResponse({'error': 'Invalid URL format'}, status=400)
                 
             analyzer = URLAnalyzer()
             analysis_results, report_path = analyzer.analyze_url(url)
@@ -388,23 +412,38 @@ def analyze_url(request):
             
             return JsonResponse(response_data)
             
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+            print(f"Error in analyze_url: {str(e)}")
+            return JsonResponse({'error': f'Analysis failed: {str(e)}'}, status=500)
             
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 def download_report(request, filename):
-    """Download a generated PDF report."""
+    """Download a generated report (PDF or HTML)."""
     try:
         file_path = os.path.join(settings.MEDIA_ROOT, 'reports', filename)
         if os.path.exists(file_path):
+            # Determine content type based on file extension
+            if filename.endswith('.pdf'):
+                content_type = 'application/pdf'
+                disposition = f'attachment; filename="{filename}"'
+            elif filename.endswith('.html'):
+                content_type = 'text/html'
+                disposition = f'inline; filename="{filename}"'
+            else:
+                content_type = 'application/octet-stream'
+                disposition = f'attachment; filename="{filename}"'
+            
             response = FileResponse(
                 open(file_path, 'rb'),
-                content_type='application/pdf'
+                content_type=content_type
             )
-            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            response['Content-Disposition'] = disposition
             return response
         else:
             return JsonResponse({'error': 'Report not found'}, status=404)
     except Exception as e:
+        print(f"Error downloading report: {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)

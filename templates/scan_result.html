@@ -592,10 +592,20 @@
                         </a>
                     </div>
             <div class="col-lg-4 d-flex align-items-end justify-content-lg-end">
-                        {% if analysis.report_path %}
-                <a href="{{ analysis.report_path }}" class="btn btn-cyber" download>
-                            <i class="fas fa-file-pdf me-2"></i>Download Report
+                {% if report_path %}
+                    {% if report_path|slice:"-4:" == ".pdf" %}
+                        <a href="/media/{{ report_path }}" class="btn btn-cyber" download>
+                            <i class="fas fa-file-pdf me-2"></i>Download PDF Report
                         </a>
+                    {% else %}
+                        <a href="/media/{{ report_path }}" class="btn btn-cyber" target="_blank">
+                            <i class="fas fa-file-code me-2"></i>View HTML Report
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <button class="btn btn-cyber" onclick="generateReport()" id="generateReportBtn">
+                        <i class="fas fa-file-pdf me-2"></i>Generate Report
+                    </button>
                         {% endif %}
                     </div>
                 </div>
@@ -690,6 +700,30 @@
     <div class="cyber-card mb-4">
         <h3 class="card-title">Debug Information</h3>
         <div class="cyber-list">
+            <div class="cyber-list-item">
+                <div class="d-flex justify-content-between">
+                    <div class="item-label">Report Path</div>
+                    <div class="item-value">{{ report_path|default:"Not Available" }}</div>
+                </div>
+            </div>
+            <div class="cyber-list-item">
+                <div class="d-flex justify-content-between">
+                    <div class="item-label">Report Type</div>
+                    <div class="item-value">
+                        {% if report_path %}
+                            {% if report_path|slice:"-4:" == ".pdf" %}
+                                PDF Report
+                            {% elif report_path|slice:"-5:" == ".html" %}
+                                HTML Report
+                            {% else %}
+                                Unknown Format
+                            {% endif %}
+                        {% else %}
+                            No Report Generated
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
             <div class="cyber-list-item">
                 <div class="d-flex justify-content-between">
                     <div class="item-label">Analysis Object</div>
@@ -1055,13 +1089,99 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Rescan button click handler
-    rescanForm.addEventListener('submit', function(e) {
-        rescanButton.classList.add('scanning');
-        startScanAnimation();
+    if (rescanForm) {
+        rescanForm.addEventListener('submit', function(e) {
+            // Prevent default form submission
+            e.preventDefault();
+            
+            // Add scanning class to button
+            if (rescanButton) {
+                rescanButton.classList.add('scanning');
+            }
+            
+            // Start the scan animation
+            startScanAnimation();
+            
+            // Submit the form after animation
+            setTimeout(() => {
+                // Remove scanning class
+                if (rescanButton) {
+                    rescanButton.classList.remove('scanning');
+                }
+                // Submit the form
+                rescanForm.submit();
+            }, 6000);
+        });
+    }
+    
+    // Report generation function
+    window.generateReport = function() {
+        const generateBtn = document.getElementById('generateReportBtn');
+        const originalText = generateBtn.innerHTML;
         
-        // Let the form submit naturally after animation
-        // The page will reload with the new scan results
-    });
+        // Show loading state
+        generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating...';
+        generateBtn.disabled = true;
+        
+        // Get CSRF token from meta tag or form
+        let csrfToken = '';
+        const csrfMeta = document.querySelector('meta[name=csrf-token]');
+        if (csrfMeta) {
+            csrfToken = csrfMeta.getAttribute('content');
+        } else {
+            const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+            if (csrfInput) {
+                csrfToken = csrfInput.value;
+            }
+        }
+        
+        // Make AJAX call to generate report
+        fetch('/api/analyze-url/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                url: '{{ url }}'
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.report_path) {
+                // Report generated successfully
+                if (data.report_path.endsWith('.pdf')) {
+                    // Download PDF
+                    window.location.href = '/media/' + data.report_path;
+                } else {
+                    // Open HTML report in new tab
+                    window.open('/media/' + data.report_path, '_blank');
+                }
+                // Update button to show success
+                generateBtn.innerHTML = '<i class="fas fa-check me-2"></i>Report Generated';
+                setTimeout(() => {
+                    generateBtn.innerHTML = originalText;
+                    generateBtn.disabled = false;
+                }, 2000);
+            } else {
+                // Show error message
+                alert('Report generation failed. Please try again.');
+                generateBtn.innerHTML = originalText;
+                generateBtn.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error generating report:', error);
+            alert('Report generation failed. Please try again.');
+            generateBtn.innerHTML = originalText;
+            generateBtn.disabled = false;
+        });
+    };
 });
 </script>
 {% endblock %}

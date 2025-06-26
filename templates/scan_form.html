@@ -532,6 +532,15 @@
         const scanLogContent = document.getElementById('scanLogContent');
         const scanStatusText = document.getElementById('scanStatusText');
         
+        // Debug logging
+        console.log('Scan form elements found:', {
+            scanForm: !!scanForm,
+            scanOverlay: !!scanOverlay,
+            topScanner: !!topScanner,
+            scanLogContent: !!scanLogContent,
+            scanStatusText: !!scanStatusText
+        });
+        
         // Log messages for the scanning animation
         const scanLogMessages = [
             "Establishing secure connection...",
@@ -578,9 +587,22 @@
         
         // Start the scan animation
         function startScanAnimation() {
+            console.log('Starting scan animation...');
+            
+            // Check if elements exist
+            if (!scanOverlay) {
+                console.error('Scan overlay not found!');
+                return;
+            }
+            
             // Show overlay with animation
             scanOverlay.classList.add('active');
-            clearLogContent();
+            console.log('Scan overlay activated');
+            
+            // Clear log content
+            if (scanLogContent) {
+                clearLogContent();
+            }
             
             // Add initial log line
             addLogLine("Initializing security scan...", 100);
@@ -590,11 +612,13 @@
             let currentStatus = 0;
             
             const statusInterval = setInterval(() => {
-                scanStatusText.textContent = statusMessages[currentStatus];
-                currentStatus = (currentStatus + 1) % statusMessages.length;
+                if (scanStatusText) {
+                    scanStatusText.textContent = statusMessages[currentStatus];
+                    currentStatus = (currentStatus + 1) % statusMessages.length;
+                }
             }, 2000);
             
-            // Add log lines with random timings - but ensure we don't add too many
+            // Add log lines with controlled timing
             let messageIndex = 0;
             const messageInterval = setInterval(() => {
                 if (messageIndex < scanLogMessages.length) {
@@ -606,33 +630,48 @@
             }, 400);
             
             // Stop the animation after 5-6 seconds - form will submit naturally
-                    setTimeout(() => {
+            setTimeout(() => {
                 clearInterval(statusInterval);
+                console.log('Scan animation completed');
             }, 5000);
         }
         
         if (scanForm) {
             scanForm.addEventListener('submit', function(e) {
-                // Check form validity
-                if (!this.checkValidity()) {
-                    return; // Let the browser handle invalid form
-                }
-                
-                // Start the scanning animation
+                // Always prevent default to show animation
                 e.preventDefault();
                 
+                // Get the URL input
+                const urlInput = this.querySelector('input[name="url"]');
+                const url = urlInput ? urlInput.value.trim() : '';
+                
+                // Basic URL validation
+                if (!url) {
+                    alert('Please enter a URL to scan');
+                    return;
+                }
+                
                 // Show the top scanner animation immediately
-                topScanner.classList.add('active');
+                if (topScanner) {
+                    topScanner.classList.add('active');
+                }
                 
                 // Add scanning class to button for loader animation
-                scanButton.classList.add('scanning');
+                if (scanButton) {
+                    scanButton.classList.add('scanning');
+                }
                 
                 // Start the scan animation
                 startScanAnimation();
                 
-                // Let the form submit naturally after animation
-                                        setTimeout(() => {
-                                            scanForm.submit();
+                // Submit the form after animation completes
+                setTimeout(() => {
+                    // Remove the scanning class
+                    if (scanButton) {
+                        scanButton.classList.remove('scanning');
+                    }
+                    // Submit the form
+                    scanForm.submit();
                 }, 6000);
             });
         }
