@@ -253,6 +253,11 @@
                 ✅ Screenshot captured successfully
                 <br><small>Path: {{ analysis.screenshot_path }}</small>
             </div>
+            <div style="margin-top: 15px; text-align: center;">
+                <img src="/media/{{ analysis.screenshot_path }}" 
+                     alt="Website Screenshot" 
+                     style="max-width: 100%; max-height: 400px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            </div>
         {% else %}
             <div class="warning">⚠️ Screenshot not available</div>
         {% endif %}

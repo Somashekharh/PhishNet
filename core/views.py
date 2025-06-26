@@ -170,7 +170,33 @@ def scan_url(request):
                 if cached_result and not force_rescan:
                     print("Using cached result")
                     cached_result['from_cache'] = True
-                    context = cached_result
+                    
+                    # For cached results, we still need to perform URL analysis to get fresh report
+                    try:
+                        print("Performing URL analysis for cached result...")
+                        url_analysis, report_path = url_analyzer.analyze_url(url)
+                        print(f"URL analysis completed for cached result: {url_analysis}")
+                        if url_analysis and isinstance(url_analysis, dict):
+                            screenshot_path = url_analysis.get('screenshot_path')
+                            if screenshot_path:
+                                screenshot_path = screenshot_path.replace('\\', '/')
+                                url_analysis['screenshot_path'] = screenshot_path
+                                print(f"Screenshot path: {screenshot_path}")
+                    except Exception as e:
+                        print(f"URL analysis error for cached result: {str(e)}")
+                        url_analysis = None
+                        report_path = None
+                    
+                    # Update cached result with fresh analysis and report
+                    context = {
+                        'url': url,
+                        'is_phishing': cached_result['is_phishing'],
+                        'confidence': cached_result['confidence'],
+                        'analysis': url_analysis,
+                        'report_path': report_path,
+                        'from_cache': True
+                    }
+                    
                     messages.info(request, 'Retrieved from cache. Use the "Rescan" button for a fresh analysis.')
                     
                     # Save to database even for cached results
@@ -212,6 +238,7 @@ def scan_url(request):
                         print("Starting URL analysis...")
                         url_analysis, report_path = url_analyzer.analyze_url(url)
                         print(f"URL analysis completed: {url_analysis}")
+                        print(f"Report path returned: {report_path}")
                         if url_analysis and isinstance(url_analysis, dict):
                             screenshot_path = url_analysis.get('screenshot_path')
                             if screenshot_path:
@@ -221,6 +248,7 @@ def scan_url(request):
                     except Exception as e:
                         print(f"URL analysis error: {str(e)}")
                         url_analysis = None
+                        report_path = None
                     
                     # Create context
                     if prediction is not None:
@@ -239,6 +267,9 @@ def scan_url(request):
                         'report_path': report_path,
                         'from_cache': False
                     }
+                    
+                    print(f"Context created - report_path: {report_path}")
+                    print(f"Context keys: {list(context.keys())}")
                     
                     # Try to cache the result
                     try:
