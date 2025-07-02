@@ -52,12 +52,14 @@ def domain_exists(url):
 class URLAnalyzer:
     def __init__(self):
         self.session = requests.Session()
-        self.timeout = 20
+        self.timeout = 7  # Lowered timeout for faster scans
         self.report_generator = ReportGenerator()
         
-    def analyze_url(self, url):
+    def analyze_url(self, url, original_url=None, include_screenshot=True):
         """Analyze a URL and gather detailed information."""
         logger.info(f"Starting analysis of URL: {url}")
+        if original_url is None:
+            original_url = url
         
         # Check internet connection first
         if not check_internet_connection():
@@ -79,7 +81,7 @@ class URLAnalyzer:
             domain_info = self._get_domain_info(url)
             security_info = self._get_security_info(url)
             content_info = self._get_content_info(url)
-            screenshot_path = self._capture_screenshot(url)
+            screenshot_path = self._capture_screenshot(url) if include_screenshot else None
             redirect_chain = self._analyze_redirects(url)
             ssl_info = self._get_ssl_info(url)
             headers = self._get_headers(url)
@@ -96,7 +98,7 @@ class URLAnalyzer:
             
             # Generate PDF report
             try:
-                report_path = self.report_generator.generate_pdf_report(url, result)
+                report_path = self.report_generator.generate_pdf_report(original_url, result)
             except Exception as e:
                 logger.error(f"Error generating PDF report: {str(e)}")
                 report_path = None

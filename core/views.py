@@ -145,6 +145,7 @@ def scan_url(request):
         form = URLScanForm(request.POST)
         if form.is_valid():
             url = form.cleaned_data['url']
+            include_screenshot = form.cleaned_data.get('include_screenshot', False)
             # Check if domain exists before proceeding
             if not domain_exists(url):
                 messages.error(request, 'The domain does not exist or is unreachable. Please check the URL and try again.')
@@ -153,7 +154,7 @@ def scan_url(request):
             
             try:
                 # Always clear cache if force rescan
-                cache_key = f'url_scan_{hashlib.md5(url.encode()).hexdigest()}'
+                cache_key = f'url_scan_{hashlib.md5(url.encode()).hexdigest()}_screenshot_{int(include_screenshot)}'
                 if force_rescan:
                     cache.delete(cache_key)
                     messages.info(request, 'Performing fresh scan as requested.')
@@ -174,7 +175,8 @@ def scan_url(request):
                     # For cached results, we still need to perform URL analysis to get fresh report
                     try:
                         print("Performing URL analysis for cached result...")
-                        url_analysis, report_path = url_analyzer.analyze_url(url)
+                        original_url = url  # This is after adding https:// if missing
+                        url_analysis, report_path = url_analyzer.analyze_url(url, original_url=original_url, include_screenshot=include_screenshot)
                         print(f"URL analysis completed for cached result: {url_analysis}")
                         if url_analysis and isinstance(url_analysis, dict):
                             screenshot_path = url_analysis.get('screenshot_path')
@@ -189,7 +191,7 @@ def scan_url(request):
                     
                     # Update cached result with fresh analysis and report
                     context = {
-                        'url': url,
+                        'url': original_url,
                         'is_phishing': cached_result['is_phishing'],
                         'confidence': cached_result['confidence'],
                         'analysis': url_analysis,
@@ -197,18 +199,21 @@ def scan_url(request):
                         'from_cache': True
                     }
                     
+                    print(f"DEBUG CACHED: URL in context: {original_url}")
+                    print(f"DEBUG CACHED: Cached result URL: {cached_result.get('url', 'Not found')}")
+                    
                     messages.info(request, 'Retrieved from cache. Use the "Rescan" button for a fresh analysis.')
                     
                     # Save to database even for cached results
                     try:
                         URLScan.objects.create(
                             user=request.user,
-                            url=url,
+                            url=original_url,
                             is_phishing=cached_result['is_phishing'],
                             confidence_score=cached_result['confidence'] / 10,  # Convert back to 0-1 scale
                             scan_date=timezone.now()
                         )
-                        print(f"Saved cached scan result to database for {url}")
+                        print(f"Saved cached scan result to database for {original_url}")
                     except Exception as db_error:
                         print(f"Database save error for cached result: {str(db_error)}")
                 else:
@@ -236,15 +241,23 @@ def scan_url(request):
                     # Get URL analysis
                     try:
                         print("Starting URL analysis...")
-                        url_analysis, report_path = url_analyzer.analyze_url(url)
+                        original_url = url  # This is after adding https:// if missing
+                        url_analysis, report_path = url_analyzer.analyze_url(url, original_url=original_url, include_screenshot=include_screenshot)
                         print(f"URL analysis completed: {url_analysis}")
                         print(f"Report path returned: {report_path}")
+                        screenshot_error = None
+                        if not include_screenshot and url_analysis and isinstance(url_analysis, dict):
+                            url_analysis['screenshot_path'] = None
+                        if include_screenshot and (not url_analysis or not url_analysis.get('screenshot_path')):
+                            screenshot_error = 'Screenshot could not be captured. This may be due to Playwright not being installed, browser issues, or network problems.'
                         if url_analysis and isinstance(url_analysis, dict):
                             screenshot_path = url_analysis.get('screenshot_path')
                             if screenshot_path:
                                 screenshot_path = screenshot_path.replace('\\', '/')
                                 url_analysis['screenshot_path'] = screenshot_path
                                 print(f"Screenshot path: {screenshot_path}")
+                        else:
+                            screenshot_path = None
                     except Exception as e:
                         print(f"URL analysis error: {str(e)}")
                         url_analysis = None
@@ -260,16 +273,19 @@ def scan_url(request):
                         display_confidence = 0
 
                     context = {
-                        'url': url,
+                        'url': original_url,
                         'is_phishing': prediction,
                         'confidence': display_confidence,  # Now out of 10
                         'analysis': url_analysis,
                         'report_path': report_path,
-                        'from_cache': False
+                        'from_cache': False,
+                        'screenshot_error': screenshot_error
                     }
                     
                     print(f"Context created - report_path: {report_path}")
                     print(f"Context keys: {list(context.keys())}")
+                    print(f"DEBUG: URL in context: {original_url}")
+                    print(f"DEBUG: Original URL from form: {url}")
                     
                     # Try to cache the result
                     try:
@@ -283,12 +299,12 @@ def scan_url(request):
                     try:
                         scan_record = URLScan.objects.create(
                             user=request.user,
-                            url=url,
+                            url=original_url,
                             is_phishing=prediction,
                             confidence_score=confidence,
                             scan_date=timezone.now()
                         )
-                        print(f"Saved new scan result to database: ID={scan_record.id}, URL={url}, Phishing={prediction}")
+                        print(f"Saved new scan result to database: ID={scan_record.id}, URL={original_url}, Phishing={prediction}")
                     except Exception as db_error:
                         print(f"Database save error for new scan: {str(db_error)}")
                         # Continue without failing the scan

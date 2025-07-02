@@ -92,14 +92,14 @@
 </head>
 <body>
     <div class="header">
-        <h1>🔒 PhishNet Security Report</h1>
+        <h1>PhishNet Security Report</h1>
         <p><strong>URL Analyzed:</strong> {{ url }}</p>
         <p><strong>Analysis Date:</strong> {{ analysis_date }}</p>
     </div>
 
     <!-- Domain Information -->
     <div class="section">
-        <h2>🌐 Domain Information</h2>
+        <h2> Domain Information</h2>
         {% if analysis.domain_info %}
             {% if analysis.domain_info.error %}
                 <div class="error">
@@ -123,7 +123,7 @@
 
     <!-- Security Information -->
     <div class="section">
-        <h2>🛡️ Security Analysis</h2>
+        <h2>Security Analysis</h2>
         {% if analysis.security_info %}
             {% if analysis.security_info.error %}
                 <div class="error">
@@ -136,9 +136,9 @@
                             <div class="info-item">
                                 <span class="info-label">{{ key|title }}:</span> 
                                 {% if value == True %}
-                                    ✅ Yes
+                                     Yes
                                 {% elif value == False %}
-                                    ❌ No
+                                     No
                                 {% else %}
                                     {{ value }}
                                 {% endif %}
@@ -154,7 +154,7 @@
 
     <!-- SSL Certificate Information -->
     <div class="section">
-        <h2>🔐 SSL Certificate</h2>
+        <h2>SSL Certificate</h2>
         {% if analysis.ssl_info %}
             {% if analysis.ssl_info.error %}
                 <div class="error">
@@ -178,7 +178,7 @@
 
     <!-- Content Analysis -->
     <div class="section">
-        <h2>📄 Content Analysis</h2>
+        <h2>Content Analysis</h2>
         {% if analysis.content_info %}
             {% if analysis.content_info.error %}
                 <div class="error">
@@ -202,7 +202,7 @@
 
     <!-- HTTP Headers -->
     <div class="section">
-        <h2>📋 HTTP Headers</h2>
+        <h2>HTTP Headers</h2>
         {% if analysis.headers %}
             {% if analysis.headers.error %}
                 <div class="error">
@@ -226,7 +226,7 @@
 
     <!-- Redirect Chain -->
     <div class="section">
-        <h2>🔄 Redirect Chain</h2>
+        <h2>Redirect Chain</h2>
         {% if analysis.redirect_chain %}
             {% if analysis.redirect_chain|length > 0 %}
                 <div class="redirect-chain">
@@ -238,7 +238,7 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="success">✅ No redirects detected</div>
+                <div class="success"> No redirects detected</div>
             {% endif %}
         {% else %}
             <div class="warning">No redirect information available</div>
@@ -247,10 +247,10 @@
 
     <!-- Screenshot Information -->
     <div class="section">
-        <h2>📸 Screenshot</h2>
+        <h2>Screenshot</h2>
         {% if analysis.screenshot_path %}
             <div class="success">
-                ✅ Screenshot captured successfully
+                Screenshot captured successfully
                 <br><small>Path: {{ analysis.screenshot_path }}</small>
             </div>
             <div style="margin-top: 15px; text-align: center;">
@@ -259,7 +259,7 @@
                      style="max-width: 100%; max-height: 400px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
             </div>
         {% else %}
-            <div class="warning">⚠️ Screenshot not available</div>
+            <div class="warning"> Screenshot not available</div>
         {% endif %}
     </div>
 

@@ -106,6 +106,7 @@ class ReportGenerator:
                 html_content = render_to_string('pdf_report.html', {
                     'url': url,
                     'analysis': analysis_results,
+                    'analysis_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                 })
                 
                 # Save HTML to temp file

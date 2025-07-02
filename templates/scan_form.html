@@ -384,68 +384,280 @@
         font-size: 0.9rem;
         line-height: 1.5;
     }
+
+    .cyber-badge {
+        display: inline-block;
+        background: linear-gradient(90deg, var(--cyber-blue), var(--cyber-green));
+        color: #fff;
+        font-family: 'Courier New', monospace;
+        font-size: 1rem;
+        font-weight: bold;
+        padding: 8px 18px;
+        border-radius: 30px;
+        box-shadow: 0 0 15px var(--cyber-blue);
+        letter-spacing: 2px;
+        margin-bottom: 18px;
+        text-shadow: 0 0 8px var(--cyber-blue);
+        border: 2px solid var(--cyber-blue);
+        text-transform: uppercase;
+    }
+    .cyber-divider {
+        border: none;
+        border-top: 2px solid var(--cyber-blue);
+        margin: 30px 0 30px 0;
+        opacity: 0.3;
+    }
+    .tips-list {
+        color: var(--cyber-green);
+        font-family: 'Courier New', monospace;
+        font-size: 1rem;
+        margin-top: 10px;
+        margin-bottom: 0;
+        padding-left: 1.2em;
+    }
+    .tips-list li {
+        margin-bottom: 8px;
+        list-style: square inside;
+        text-shadow: 0 0 6px var(--cyber-green);
+    }
+    .why-card {
+        background: rgba(10, 14, 26, 0.7);
+        border: 1.5px solid var(--cyber-green);
+        border-radius: 10px;
+        padding: 18px 22px;
+        margin-bottom: 22px;
+        box-shadow: 0 0 18px rgba(0,255,136,0.08);
+    }
+    .why-title {
+        color: var(--cyber-green);
+        font-size: 1.2rem;
+        font-family: 'Courier New', monospace;
+        font-weight: bold;
+        margin-bottom: 10px;
+        letter-spacing: 1px;
+        text-shadow: 0 0 8px var(--cyber-green);
+    }
+    .example-urls {
+        font-family: 'Courier New', monospace;
+        color: var(--cyber-blue);
+        background: rgba(0, 212, 255, 0.08);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 8px;
+        padding: 10px 18px;
+        margin-bottom: 18px;
+        font-size: 0.98rem;
+    }
+    .example-urls span {
+        color: var(--cyber-green);
+        font-weight: bold;
+    }
+    .cyber-switch {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+    .cyber-switch input[type="checkbox"] {
+        display: none;
+    }
+    .cyber-switch-label {
+        color: var(--cyber-green);
+        font-family: 'Courier New', monospace;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        user-select: none;
+    }
+    .cyber-toggle {
+        width: 48px;
+        height: 26px;
+        background: linear-gradient(90deg, var(--cyber-blue), var(--cyber-green));
+        border-radius: 16px;
+        position: relative;
+        transition: background 0.3s;
+        box-shadow: 0 0 8px var(--cyber-blue);
+        border: 2px solid var(--cyber-blue);
+    }
+    .cyber-toggle::after {
+        content: '';
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 20px;
+        height: 20px;
+        background: #0A0E1A;
+        border-radius: 50%;
+        box-shadow: 0 0 8px var(--cyber-green);
+        transition: left 0.3s, background 0.3s;
+    }
+    .cyber-switch input[type="checkbox"]:checked + .cyber-toggle {
+        background: linear-gradient(90deg, var(--cyber-green), var(--cyber-blue));
+        box-shadow: 0 0 12px var(--cyber-green);
+        border-color: var(--cyber-green);
+    }
+    .cyber-switch input[type="checkbox"]:checked + .cyber-toggle::after {
+        left: 25px;
+        background: #00FF88;
+        box-shadow: 0 0 12px var(--cyber-green);
+    }
+    .cyberpunk-toggle-wrap {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 10px;
+    }
+    .cyberpunk-toggle-input {
+        display: none;
+    }
+    .cyberpunk-toggle-label {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        width: 54px;
+        height: 24px;
+        user-select: none;
+    }
+    .cyberpunk-toggle-inner {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, #0a2a3a 0%, #0e3c2f 100%);
+        border-radius: 14px;
+        box-shadow: 0 0 4px var(--cyber-blue, #00D4FF);
+        position: relative;
+        transition: background 0.3s, box-shadow 0.3s;
+    }
+    .cyberpunk-toggle-on,
+    .cyberpunk-toggle-off {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        font-weight: bold;
+        z-index: 2;
+        pointer-events: none;
+        transition: color 0.2s, opacity 0.2s;
+    }
+    .cyberpunk-toggle-on {
+        left: 7px;
+        color: #00FF88;
+        opacity: 0.95;
+    }
+    .cyberpunk-toggle-off {
+        right: 7px;
+        color: #FF0040;
+        opacity: 0.95;
+    }
+    .cyberpunk-toggle-input:checked + .cyberpunk-toggle-label .cyberpunk-toggle-on {
+        color: #00FF88;
+        opacity: 1;
+    }
+    .cyberpunk-toggle-input:checked + .cyberpunk-toggle-label .cyberpunk-toggle-off {
+        color: #FF0040;
+        opacity: 0.55;
+    }
+    .cyberpunk-toggle-input:not(:checked) + .cyberpunk-toggle-label .cyberpunk-toggle-on {
+        color: #00FF88;
+        opacity: 0.55;
+    }
+    .cyberpunk-toggle-input:not(:checked) + .cyberpunk-toggle-label .cyberpunk-toggle-off {
+        color: #FF0040;
+        opacity: 1;
+    }
+    .cyberpunk-toggle-knob {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        background: #16202a;
+        border-radius: 50%;
+        box-shadow: 0 0 4px #1a8a7a;
+        transition: left 0.3s, background 0.3s, box-shadow 0.3s;
+        z-index: 3;
+    }
+    .cyberpunk-toggle-input:checked + .cyberpunk-toggle-label .cyberpunk-toggle-inner {
+        background: linear-gradient(90deg, #1a8a7a 0%, #1a3a8a 100%);
+        box-shadow: 0 0 7px #1a8a7a;
+    }
+    .cyberpunk-toggle-input:checked + .cyberpunk-toggle-label .cyberpunk-toggle-knob {
+        left: 30px;
+        background: #1a3a8a;
+        box-shadow: 0 0 7px #1a8a7a;
+    }
+    .cyber-toggle-desc {
+        color: var(--cyber-green);
+        font-family: 'Courier New', monospace;
+        font-size: 1rem;
+        user-select: none;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Top Scanner Animation -->
-<div class="top-scanner" id="topScanner">
-    <div class="top-scanner-bar"></div>
-</div>
-
-<!-- Scanning Animation Overlay -->
-<div class="scan-overlay" id="scanOverlay">
-            <div class="scan-grid"></div>
-    <div class="scan-status">
-        <span id="scanStatusText">Initiating Scan</span>
-        <span class="scan-dots">...</span>
-            </div>
-    
-    <div class="scan-progress">
-        <div class="scan-progress-bar"></div>
+<!-- Welcome Section -->
+<div class="cyber-container">
+    <div class="text-center">
+        <span class="cyber-badge"><i class="fas fa-shield-virus me-2"></i>AI-Powered URL Scanner</span>
+        <h1 class="cyber-title">Welcome to PhishNet</h1>
+        <p class="cyber-subtitle">Scan any link for phishing, malware, and suspicious activity. Stay safe online with our advanced machine learning engine and real-time threat analysis.</p>
+    </div>
+    <div class="why-card">
+        <div class="why-title"><i class="fas fa-question-circle me-2"></i>Why Scan URLs?</div>
+        <div style="color: var(--text-secondary); font-size: 1rem;">
+            Cybercriminals use deceptive links to steal your data, infect your device, or trick you into scams. PhishNet instantly analyzes links for hidden threats, so you can browse and share with confidence.
         </div>
-    
-    <div class="scan-log">
-        <div class="scan-log-content" id="scanLogContent">
-            <!-- Log lines will be added dynamically -->
     </div>
+    <div class="example-urls mb-4">
+        <span>Try scanning:</span> <br>
+        youtube.com &nbsp;|&nbsp; github.com &nbsp;|&nbsp; example.com &nbsp;|&nbsp; bit.ly/xyz123
     </div>
+    <hr class="cyber-divider">
 </div>
 
 <div class="cyber-container">
-    <h1 class="cyber-title">PhishNet Scanner</h1>
-    <p class="cyber-subtitle">Advanced AI-powered phishing detection system</p>
-    
     <div class="row justify-content-center">
         <div class="col-md-10">
             <div class="scan-card">
                 <form method="post" novalidate autocomplete="off" id="scanForm">
-                        {% csrf_token %}
-                    
-                        <div class="mb-4">
+                    {% csrf_token %}
+                    <div class="mb-4">
                         <label for="{{ form.url.id_for_label }}" class="form-label">
                             <i class="fas fa-link me-2"></i>Enter URL to scan
                         </label>
                         {{ form.url.errors }}
-                                {{ form.url }}
+                        {{ form.url }}
                         {% if form.url.help_text %}
                             <small class="form-text text-muted">{{ form.url.help_text }}</small>
-                            {% endif %}
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <div class="cyberpunk-toggle-wrap">
+                            <input type="checkbox" id="id_include_screenshot" name="include_screenshot" class="cyberpunk-toggle-input" {% if form.include_screenshot.value %}checked{% endif %}>
+                            <label class="cyberpunk-toggle-label" for="id_include_screenshot">
+                                <span class="cyberpunk-toggle-inner">
+                                    <span class="cyberpunk-toggle-on">ON</span>
+                                    <span class="cyberpunk-toggle-off">OFF</span>
+                                    <span class="cyberpunk-toggle-knob"></span>
+                                </span>
+                            </label>
+                            <span class="cyber-toggle-desc"><i class="fas fa-image me-1"></i>Include Screenshot</span>
                         </div>
-                        
+                    </div>
                     <div class="d-grid">
                         <button type="submit" class="btn btn-scan" id="scanButton">
                             <i class="fas fa-shield-alt me-2"></i>Scan URL
                             <div class="scan-loader"></div>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-                
+                        </button>
+                    </div>
+                </form>
+            </div>
             <!-- Information Section -->
             <div class="info-section">
                 <h2 class="info-title">How PhishNet Protects You</h2>
-                
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <div class="info-card">
@@ -455,45 +667,76 @@
                             <p class="info-card-text">
                                 Our machine learning algorithms analyze multiple URL features to identify phishing attempts with high accuracy.
                             </p>
-            </div>
-        </div>
-        
+                        </div>
+                    </div>
                     <div class="col-md-6 mb-3">
                         <div class="info-card">
                             <div class="info-card-title">
                                 <i class="fas fa-lock"></i> SSL Certificate Analysis
-                </div>
+                            </div>
                             <p class="info-card-text">
                                 We verify the authenticity of website certificates to ensure secure connections.
                             </p>
-            </div>
-            </div>
-            
+                        </div>
+                    </div>
                     <div class="col-md-6 mb-3">
                         <div class="info-card">
                             <div class="info-card-title">
                                 <i class="fas fa-code"></i> Content Examination
-                </div>
+                            </div>
                             <p class="info-card-text">
                                 PhishNet analyzes webpage content for suspicious patterns and malicious code.
                             </p>
-                </div>
-            </div>
-            
+                        </div>
+                    </div>
                     <div class="col-md-6 mb-3">
                         <div class="info-card">
                             <div class="info-card-title">
                                 <i class="fas fa-database"></i> Threat Database
-                </div>
+                            </div>
                             <p class="info-card-text">
                                 URLs are compared against our constantly updated database of known phishing threats.
                             </p>
-                    </div>
+                        </div>
                     </div>
                 </div>
+                <hr class="cyber-divider">
+                <div class="why-title" style="color: var(--cyber-blue);"><i class="fas fa-user-shield me-2"></i>Tips for Safe Browsing</div>
+                <ul class="tips-list">
+                    <li>Always check the URL for typos or strange characters.</li>
+                    <li>Hover over links to preview the real destination.</li>
+                    <li>Never enter credentials on suspicious or unfamiliar sites.</li>
+                    <li>Look for HTTPS and a valid certificate before submitting sensitive info.</li>
+                    <li>Be cautious with shortened links (bit.ly, tinyurl, etc.).</li>
+                </ul>
             </div>
         </div>
     </div>
+</div>
+
+<!-- Top Scanner Animation -->
+<div class="top-scanner" id="topScanner">
+    <div class="top-scanner-bar"></div>
+</div>
+
+<!-- Scanning Animation Overlay -->
+<div class="scan-overlay" id="scanOverlay">
+    <div class="scan-grid"></div>
+    <div class="scan-status">
+        <span id="scanStatusText">Initiating Scan</span>
+        <span class="scan-dots">...</span>
+    </div>
+    <div class="scan-progress">
+        <div class="scan-progress-bar"></div>
+    </div>
+    <div class="scan-log">
+        <div class="scan-log-content" id="scanLogContent">
+            <!-- Log lines will be added dynamically -->
+        </div>
+    </div>
+    <button type="button" class="btn btn-danger btn-cyber" id="cancelScanBtn" style="margin-top: 20px; background: linear-gradient(90deg, #ff0040, #8A2BE2); border: 2px solid #ff0040; color: #fff; font-family: 'Courier New', monospace; font-weight: bold; letter-spacing: 1px; border-radius: 8px; box-shadow: 0 0 10px #ff0040;">
+        <i class="fas fa-times-circle me-2"></i>Cancel Scan
+    </button>
 </div>
 
 <script>
@@ -502,36 +745,30 @@
         const inputs = document.querySelectorAll('input, textarea');
         inputs.forEach(input => {
             input.classList.add('form-control');
-            
             // Add focus animation
             input.addEventListener('focus', function() {
                 this.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.3)';
             });
-            
             input.addEventListener('blur', function() {
                 this.style.boxShadow = '';
             });
         });
-        
         // Button hover effect
         const scanButton = document.getElementById('scanButton');
         if (scanButton) {
             scanButton.addEventListener('mouseover', function() {
                 this.querySelector('i').classList.add('fa-spin');
             });
-            
             scanButton.addEventListener('mouseout', function() {
                 this.querySelector('i').classList.remove('fa-spin');
             });
         }
-        
         // Handle form submission to show scanning animation
         const scanForm = document.getElementById('scanForm');
         const scanOverlay = document.getElementById('scanOverlay');
         const topScanner = document.getElementById('topScanner');
         const scanLogContent = document.getElementById('scanLogContent');
         const scanStatusText = document.getElementById('scanStatusText');
-        
         // Debug logging
         console.log('Scan form elements found:', {
             scanForm: !!scanForm,
@@ -540,7 +777,6 @@
             scanLogContent: !!scanLogContent,
             scanStatusText: !!scanStatusText
         });
-        
         // Log messages for the scanning animation
         const scanLogMessages = [
             "Establishing secure connection...",
@@ -559,133 +795,144 @@
             "Generating security score...",
             "Finalizing analysis results..."
         ];
-        
         // Clear existing log content
         function clearLogContent() {
             scanLogContent.innerHTML = '';
         }
-        
         // Add a log line with typing effect
         // Keep only the most recent 5 messages since we removed scrolling
         function addLogLine(text, delay) {
             const logLine = document.createElement('p');
             logLine.className = 'scan-log-line';
             logLine.textContent = text;
-            
             // If we have too many lines, remove the oldest one
             const existingLines = scanLogContent.querySelectorAll('.scan-log-line');
             if (existingLines.length >= 5) {
                 scanLogContent.removeChild(existingLines[0]);
             }
-            
             scanLogContent.appendChild(logLine);
-            
             setTimeout(() => {
                 logLine.classList.add('active');
             }, delay);
         }
-        
+        let scanCanceled = false;
+        let scanInProgress = false;
+        let statusInterval = null;
+        let messageInterval = null;
+        let scanTimeout = null;
+        const cancelScanBtn = document.getElementById('cancelScanBtn');
         // Start the scan animation
         function startScanAnimation() {
-            console.log('Starting scan animation...');
-            
-            // Check if elements exist
-            if (!scanOverlay) {
-                console.error('Scan overlay not found!');
-                return;
-            }
-            
-            // Show overlay with animation
-            scanOverlay.classList.add('active');
-            console.log('Scan overlay activated');
-            
-            // Clear log content
-            if (scanLogContent) {
-                clearLogContent();
-            }
-            
-            // Add initial log line
-            addLogLine("Initializing security scan...", 100);
-            
-            // Show scanning status messages in sequence
-            let statusMessages = ["Initiating Scan", "Processing URL", "Running Analysis", "Detecting Threats", "Generating Report"];
-            let currentStatus = 0;
-            
-            const statusInterval = setInterval(() => {
-                if (scanStatusText) {
-                    scanStatusText.textContent = statusMessages[currentStatus];
-                    currentStatus = (currentStatus + 1) % statusMessages.length;
+            try {
+                console.log('Starting scan animation...');
+                if (!scanOverlay) {
+                    console.error('Scan overlay not found!');
+                    return;
                 }
-            }, 2000);
-            
-            // Add log lines with controlled timing
-            let messageIndex = 0;
-            const messageInterval = setInterval(() => {
-                if (messageIndex < scanLogMessages.length) {
-                    addLogLine(scanLogMessages[messageIndex], 10);
-                    messageIndex++;
-                } else {
-                    clearInterval(messageInterval);
+                scanOverlay.classList.add('active');
+                scanCanceled = false;
+                scanInProgress = true;
+                if (scanButton) scanButton.disabled = true;
+                console.log('Scan overlay activated');
+                if (scanLogContent) {
+                    clearLogContent();
                 }
-            }, 400);
-            
-            // Stop the animation after 5-6 seconds - form will submit naturally
-            setTimeout(() => {
-                clearInterval(statusInterval);
-                console.log('Scan animation completed');
-            }, 5000);
+                addLogLine("Initializing security scan...", 100);
+                let statusMessages = ["Initiating Scan", "Processing URL", "Running Analysis", "Detecting Threats", "Generating Report"];
+                let currentStatus = 0;
+                statusInterval = setInterval(() => {
+                    if (scanStatusText) {
+                        scanStatusText.textContent = statusMessages[currentStatus];
+                        currentStatus = (currentStatus + 1) % statusMessages.length;
+                    }
+                }, 2000);
+                let messageIndex = 0;
+                messageInterval = setInterval(() => {
+                    if (messageIndex < scanLogMessages.length) {
+                        addLogLine(scanLogMessages[messageIndex], 10);
+                        messageIndex++;
+                    } else {
+                        clearInterval(messageInterval);
+                    }
+                }, 400);
+                // Stop the animation after 5-6 seconds - form will submit naturally
+                scanTimeout = setTimeout(() => {
+                    if (!scanCanceled) {
+                        clearInterval(statusInterval);
+                        clearInterval(messageInterval);
+                        scanInProgress = false;
+                        if (scanForm) {
+                            scanForm.submit();
+                        }
+                    }
+                }, 6000);
+            } catch (err) {
+                console.error('Error in startScanAnimation:', err);
+                if (scanButton) scanButton.disabled = false;
+                scanOverlay.classList.remove('active');
+                scanInProgress = false;
+            }
         }
-        
         if (scanForm) {
             scanForm.addEventListener('submit', function(e) {
-                // Always prevent default to show animation
                 e.preventDefault();
-                
+                if (scanInProgress) {
+                    // Prevent double scan
+                    return;
+                }
                 // Get the URL input
                 const urlInput = this.querySelector('input[name="url"]');
                 const url = urlInput ? urlInput.value.trim() : '';
-                
-                // Basic URL validation
                 if (!url) {
                     alert('Please enter a URL to scan');
                     return;
                 }
-                
-                // Show the top scanner animation immediately
                 if (topScanner) {
                     topScanner.classList.add('active');
                 }
-                
-                // Add scanning class to button for loader animation
                 if (scanButton) {
                     scanButton.classList.add('scanning');
+                    scanButton.disabled = true;
                 }
-                
-                // Start the scan animation
+                scanCanceled = false;
+                scanInProgress = true;
                 startScanAnimation();
-                
-                // Submit the form after animation completes
-                setTimeout(() => {
-                    // Remove the scanning class
-                    if (scanButton) {
-                        scanButton.classList.remove('scanning');
-                    }
-                    // Submit the form
-                    scanForm.submit();
-                }, 6000);
             });
         }
-        
+        if (cancelScanBtn) {
+            cancelScanBtn.addEventListener('click', function() {
+                scanCanceled = true;
+                scanInProgress = false;
+                scanOverlay.classList.remove('active');
+                if (scanButton) {
+                    scanButton.classList.remove('scanning');
+                    scanButton.disabled = false;
+                }
+                if (topScanner) {
+                    topScanner.classList.remove('active');
+                }
+                if (statusInterval) clearInterval(statusInterval);
+                if (messageInterval) clearInterval(messageInterval);
+                if (scanTimeout) clearTimeout(scanTimeout);
+            });
+        }
         // Add hover effect to info cards
         document.querySelectorAll('.info-card').forEach(card => {
             card.addEventListener('mouseenter', function() {
                 this.style.borderColor = 'rgba(0, 255, 136, 0.3)';
             });
-            
             card.addEventListener('mouseleave', function() {
                 this.style.borderColor = 'rgba(0, 212, 255, 0.1)';
             });
         });
-});
+        // Screenshot ON/OFF label logic
+        const screenshotCheckbox = document.getElementById('id_include_screenshot');
+        const screenshotToggleState = document.getElementById('screenshotToggleState');
+        if (screenshotCheckbox && screenshotToggleState) {
+            screenshotCheckbox.addEventListener('change', function() {
+                screenshotToggleState.textContent = this.checked ? 'ON' : 'OFF';
+            });
+        }
+    });
 </script>
 {% endblock %}
