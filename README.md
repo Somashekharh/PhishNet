@@ -120,9 +120,6 @@ Utility scripts for system maintenance:
 - **PDF Generation**: wkhtmltopdf
 - **Security**: Django's built-in security features
 
-## 📄 License
-
-This project is licensed under the MIT License.
 
 ## 🤝 Contributing
 
